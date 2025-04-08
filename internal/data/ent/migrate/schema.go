@@ -9,26 +9,12 @@ import (
 )
 
 var (
-	// BiliLiveSettingColumns holds the columns for the "bili_live_setting" table.
-	BiliLiveSettingColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "room_id", Type: field.TypeInt64},
-		{Name: "live_state", Type: field.TypeInt64},
-		{Name: "live_start_time", Type: field.TypeTime},
-		{Name: "live_end_time", Type: field.TypeTime},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
-	}
-	// BiliLiveSettingTable holds the schema information for the "bili_live_setting" table.
-	BiliLiveSettingTable = &schema.Table{
-		Name:       "bili_live_setting",
-		Columns:    BiliLiveSettingColumns,
-		PrimaryKey: []*schema.Column{BiliLiveSettingColumns[0]},
-	}
 	// BotsColumns holds the columns for the "bots" table.
 	BotsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "bot_id", Type: field.TypeInt64},
 		{Name: "bot_name", Type: field.TypeString},
+		{Name: "self_id", Type: field.TypeInt64},
 		{Name: "status", Type: field.TypeInt, Default: 1},
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
@@ -39,15 +25,49 @@ var (
 		Columns:    BotsColumns,
 		PrimaryKey: []*schema.Column{BotsColumns[0]},
 	}
+	// SubsColumns holds the columns for the "subs" table.
+	SubsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "sub_type", Type: field.TypeInt64},
+		{Name: "group_id", Type: field.TypeInt64},
+		{Name: "sub_id", Type: field.TypeInt64},
+		{Name: "bot_id", Type: field.TypeInt64},
+		{Name: "status", Type: field.TypeInt, Default: 1},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
+	}
+	// SubsTable holds the schema information for the "subs" table.
+	SubsTable = &schema.Table{
+		Name:       "subs",
+		Columns:    SubsColumns,
+		PrimaryKey: []*schema.Column{SubsColumns[0]},
+	}
+	// SubBiliLiveColumns holds the columns for the "sub_bili_live" table.
+	SubBiliLiveColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "room_id", Type: field.TypeInt64},
+		{Name: "live_state", Type: field.TypeInt64},
+		{Name: "live_start_time", Type: field.TypeTime},
+		{Name: "live_end_time", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "update_time", Type: field.TypeTime},
+	}
+	// SubBiliLiveTable holds the schema information for the "sub_bili_live" table.
+	SubBiliLiveTable = &schema.Table{
+		Name:       "sub_bili_live",
+		Columns:    SubBiliLiveColumns,
+		PrimaryKey: []*schema.Column{SubBiliLiveColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		BiliLiveSettingTable,
 		BotsTable,
+		SubsTable,
+		SubBiliLiveTable,
 	}
 )
 
 func init() {
-	BiliLiveSettingTable.Annotation = &entsql.Annotation{
-		Table: "bili_live_setting",
+	SubBiliLiveTable.Annotation = &entsql.Annotation{
+		Table: "sub_bili_live",
 	}
 }

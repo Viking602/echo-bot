@@ -17,8 +17,12 @@ type Bot struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
+	// BotID holds the value of the "bot_id" field.
+	BotID int64 `json:"bot_id,omitempty"`
 	// BotName holds the value of the "bot_name" field.
 	BotName string `json:"bot_name,omitempty"`
+	// SelfID holds the value of the "self_id" field.
+	SelfID int64 `json:"self_id,omitempty"`
 	// Status holds the value of the "status" field.
 	Status int `json:"status,omitempty"`
 	// CreateTime holds the value of the "create_time" field.
@@ -33,7 +37,7 @@ func (*Bot) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case bot.FieldID, bot.FieldStatus:
+		case bot.FieldID, bot.FieldBotID, bot.FieldSelfID, bot.FieldStatus:
 			values[i] = new(sql.NullInt64)
 		case bot.FieldBotName:
 			values[i] = new(sql.NullString)
@@ -60,11 +64,23 @@ func (b *Bot) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			b.ID = int64(value.Int64)
+		case bot.FieldBotID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field bot_id", values[i])
+			} else if value.Valid {
+				b.BotID = value.Int64
+			}
 		case bot.FieldBotName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field bot_name", values[i])
 			} else if value.Valid {
 				b.BotName = value.String
+			}
+		case bot.FieldSelfID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field self_id", values[i])
+			} else if value.Valid {
+				b.SelfID = value.Int64
 			}
 		case bot.FieldStatus:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -120,8 +136,14 @@ func (b *Bot) String() string {
 	var builder strings.Builder
 	builder.WriteString("Bot(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", b.ID))
+	builder.WriteString("bot_id=")
+	builder.WriteString(fmt.Sprintf("%v", b.BotID))
+	builder.WriteString(", ")
 	builder.WriteString("bot_name=")
 	builder.WriteString(b.BotName)
+	builder.WriteString(", ")
+	builder.WriteString("self_id=")
+	builder.WriteString(fmt.Sprintf("%v", b.SelfID))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", b.Status))

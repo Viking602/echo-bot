@@ -1,6 +1,8 @@
 package bot
 
 import (
+	"context"
+	"echo/internal/biz"
 	"echo/internal/model"
 	"echo/internal/registry"
 	"echo/pkg/logger"
@@ -13,9 +15,10 @@ type Handler struct {
 	socket   *gws.Conn
 	registry *registry.CommandRegistry
 	logger   *logger.Logger
+	bot      *biz.BotUsecase
 }
 
-func NewBotHandler(registry *registry.CommandRegistry, log *logger.Logger) *Handler {
+func NewBotHandler(registry *registry.CommandRegistry, log *logger.Logger, bot *biz.BotUsecase) *Handler {
 	return &Handler{
 		registry: registry,
 		logger:   log,
@@ -52,6 +55,8 @@ func (h *Handler) OnMessage(socket *gws.Conn, message *gws.Message) {
 }
 
 func (h *Handler) sendReply(msg *model.OneBotMessage, content string) {
+	ctx := context.Background()
+	h.bot.CreateBot(ctx, msg.SelfId)
 	var action model.OneBotAction
 	if msg.MessageType == "private" {
 		action = model.OneBotAction{

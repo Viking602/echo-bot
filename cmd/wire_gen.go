@@ -7,10 +7,12 @@
 package main
 
 import (
+	"echo/internal/biz"
 	"echo/internal/command"
+	"echo/internal/data"
 	"echo/internal/service"
 	"echo/pkg/app"
-	bot2 "echo/pkg/bot"
+	"echo/pkg/bot"
 	"echo/pkg/logger"
 )
 
@@ -19,8 +21,14 @@ import (
 func wireApp(log *logger.Logger) (*app.App, error) {
 	echoService := service.NewEchoService()
 	commandRegistry := command.NewInitializedRegistry(echoService)
-	handler := bot2.NewBotHandler(commandRegistry, log)
-	botBot := bot2.NewBot(handler)
+	dataData, err := data.NewData()
+	if err != nil {
+		return nil, err
+	}
+	botRepo := data.NewBotRepo(dataData)
+	botUsecase := biz.NewBotUsecase(botRepo)
+	handler := bot.NewBotHandler(commandRegistry, log, botUsecase)
+	botBot := bot.NewBot(handler)
 	appApp := app.NewApp(botBot, log)
 	return appApp, nil
 }

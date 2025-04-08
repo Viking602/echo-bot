@@ -7,19 +7,19 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// BiliLiveSetting holds the schema definition for the BiliLiveSetting entity.
-type BiliLiveSetting struct {
+// SubBiliLive holds the schema definition for the BiliLiveSetting entity.
+type SubBiliLive struct {
 	ent.Schema
 }
 
-func (BiliLiveSetting) Annotations() []schema.Annotation {
+func (SubBiliLive) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "bili_live_setting"},
+		entsql.Annotation{Table: "sub_bili_live"},
 	}
 }
 
 // Fields of the BiliLiveSetting.
-func (BiliLiveSetting) Fields() []ent.Field {
+func (SubBiliLive) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").Unique(),
 		field.Int64("room_id"),
@@ -32,6 +32,6 @@ func (BiliLiveSetting) Fields() []ent.Field {
 }
 
 // Edges of the BiliLiveSetting.
-func (BiliLiveSetting) Edges() []ent.Edge {
+func (SubBiliLive) Edges() []ent.Edge {
 	return nil
 }

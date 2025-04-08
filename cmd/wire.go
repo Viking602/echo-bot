@@ -4,7 +4,9 @@
 package main
 
 import (
+	"echo/internal/biz"
 	"echo/internal/command"
+	"echo/internal/data"
 	"echo/internal/service"
 	"echo/pkg/app"
 	bot2 "echo/pkg/bot"
@@ -18,6 +20,8 @@ func wireApp(log *logger.Logger) (*app.App, error) {
 		bot2.NewBot,         // 提供 *bot.Bot
 		service.ProviderSet, // 提供 service 包的依赖
 		command.ProviderSet, // 提供 command 包的依赖
+		data.ProviderSet,    // 提供 data 包的依赖
+		biz.ProviderSet,     // 提供 biz 包的依赖
 		app.NewApp,          // 提供 *app.App
 	))
 }

@@ -4,8 +4,9 @@ package ent
 
 import (
 	"context"
-	"echo/internal/data/ent/bililivesetting"
 	"echo/internal/data/ent/bot"
+	"echo/internal/data/ent/sub"
+	"echo/internal/data/ent/subbililive"
 	"errors"
 	"fmt"
 	"reflect"
@@ -74,8 +75,9 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			bililivesetting.Table: bililivesetting.ValidColumn,
-			bot.Table:             bot.ValidColumn,
+			bot.Table:         bot.ValidColumn,
+			sub.Table:         sub.ValidColumn,
+			subbililive.Table: subbililive.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

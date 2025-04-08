@@ -54,9 +54,19 @@ func IDLTE(id int64) predicate.Bot {
 	return predicate.Bot(sql.FieldLTE(FieldID, id))
 }
 
+// BotID applies equality check predicate on the "bot_id" field. It's identical to BotIDEQ.
+func BotID(v int64) predicate.Bot {
+	return predicate.Bot(sql.FieldEQ(FieldBotID, v))
+}
+
 // BotName applies equality check predicate on the "bot_name" field. It's identical to BotNameEQ.
 func BotName(v string) predicate.Bot {
 	return predicate.Bot(sql.FieldEQ(FieldBotName, v))
+}
+
+// SelfID applies equality check predicate on the "self_id" field. It's identical to SelfIDEQ.
+func SelfID(v int64) predicate.Bot {
+	return predicate.Bot(sql.FieldEQ(FieldSelfID, v))
 }
 
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
@@ -72,6 +82,46 @@ func CreateTime(v time.Time) predicate.Bot {
 // UpdateTime applies equality check predicate on the "update_time" field. It's identical to UpdateTimeEQ.
 func UpdateTime(v time.Time) predicate.Bot {
 	return predicate.Bot(sql.FieldEQ(FieldUpdateTime, v))
+}
+
+// BotIDEQ applies the EQ predicate on the "bot_id" field.
+func BotIDEQ(v int64) predicate.Bot {
+	return predicate.Bot(sql.FieldEQ(FieldBotID, v))
+}
+
+// BotIDNEQ applies the NEQ predicate on the "bot_id" field.
+func BotIDNEQ(v int64) predicate.Bot {
+	return predicate.Bot(sql.FieldNEQ(FieldBotID, v))
+}
+
+// BotIDIn applies the In predicate on the "bot_id" field.
+func BotIDIn(vs ...int64) predicate.Bot {
+	return predicate.Bot(sql.FieldIn(FieldBotID, vs...))
+}
+
+// BotIDNotIn applies the NotIn predicate on the "bot_id" field.
+func BotIDNotIn(vs ...int64) predicate.Bot {
+	return predicate.Bot(sql.FieldNotIn(FieldBotID, vs...))
+}
+
+// BotIDGT applies the GT predicate on the "bot_id" field.
+func BotIDGT(v int64) predicate.Bot {
+	return predicate.Bot(sql.FieldGT(FieldBotID, v))
+}
+
+// BotIDGTE applies the GTE predicate on the "bot_id" field.
+func BotIDGTE(v int64) predicate.Bot {
+	return predicate.Bot(sql.FieldGTE(FieldBotID, v))
+}
+
+// BotIDLT applies the LT predicate on the "bot_id" field.
+func BotIDLT(v int64) predicate.Bot {
+	return predicate.Bot(sql.FieldLT(FieldBotID, v))
+}
+
+// BotIDLTE applies the LTE predicate on the "bot_id" field.
+func BotIDLTE(v int64) predicate.Bot {
+	return predicate.Bot(sql.FieldLTE(FieldBotID, v))
 }
 
 // BotNameEQ applies the EQ predicate on the "bot_name" field.
@@ -137,6 +187,46 @@ func BotNameEqualFold(v string) predicate.Bot {
 // BotNameContainsFold applies the ContainsFold predicate on the "bot_name" field.
 func BotNameContainsFold(v string) predicate.Bot {
 	return predicate.Bot(sql.FieldContainsFold(FieldBotName, v))
+}
+
+// SelfIDEQ applies the EQ predicate on the "self_id" field.
+func SelfIDEQ(v int64) predicate.Bot {
+	return predicate.Bot(sql.FieldEQ(FieldSelfID, v))
+}
+
+// SelfIDNEQ applies the NEQ predicate on the "self_id" field.
+func SelfIDNEQ(v int64) predicate.Bot {
+	return predicate.Bot(sql.FieldNEQ(FieldSelfID, v))
+}
+
+// SelfIDIn applies the In predicate on the "self_id" field.
+func SelfIDIn(vs ...int64) predicate.Bot {
+	return predicate.Bot(sql.FieldIn(FieldSelfID, vs...))
+}
+
+// SelfIDNotIn applies the NotIn predicate on the "self_id" field.
+func SelfIDNotIn(vs ...int64) predicate.Bot {
+	return predicate.Bot(sql.FieldNotIn(FieldSelfID, vs...))
+}
+
+// SelfIDGT applies the GT predicate on the "self_id" field.
+func SelfIDGT(v int64) predicate.Bot {
+	return predicate.Bot(sql.FieldGT(FieldSelfID, v))
+}
+
+// SelfIDGTE applies the GTE predicate on the "self_id" field.
+func SelfIDGTE(v int64) predicate.Bot {
+	return predicate.Bot(sql.FieldGTE(FieldSelfID, v))
+}
+
+// SelfIDLT applies the LT predicate on the "self_id" field.
+func SelfIDLT(v int64) predicate.Bot {
+	return predicate.Bot(sql.FieldLT(FieldSelfID, v))
+}
+
+// SelfIDLTE applies the LTE predicate on the "self_id" field.
+func SelfIDLTE(v int64) predicate.Bot {
+	return predicate.Bot(sql.FieldLTE(FieldSelfID, v))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.

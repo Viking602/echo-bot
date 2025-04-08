@@ -20,9 +20,21 @@ type BotCreate struct {
 	hooks    []Hook
 }
 
+// SetBotID sets the "bot_id" field.
+func (bc *BotCreate) SetBotID(i int64) *BotCreate {
+	bc.mutation.SetBotID(i)
+	return bc
+}
+
 // SetBotName sets the "bot_name" field.
 func (bc *BotCreate) SetBotName(s string) *BotCreate {
 	bc.mutation.SetBotName(s)
+	return bc
+}
+
+// SetSelfID sets the "self_id" field.
+func (bc *BotCreate) SetSelfID(i int64) *BotCreate {
+	bc.mutation.SetSelfID(i)
 	return bc
 }
 
@@ -101,8 +113,14 @@ func (bc *BotCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (bc *BotCreate) check() error {
+	if _, ok := bc.mutation.BotID(); !ok {
+		return &ValidationError{Name: "bot_id", err: errors.New(`ent: missing required field "Bot.bot_id"`)}
+	}
 	if _, ok := bc.mutation.BotName(); !ok {
 		return &ValidationError{Name: "bot_name", err: errors.New(`ent: missing required field "Bot.bot_name"`)}
+	}
+	if _, ok := bc.mutation.SelfID(); !ok {
+		return &ValidationError{Name: "self_id", err: errors.New(`ent: missing required field "Bot.self_id"`)}
 	}
 	if _, ok := bc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Bot.status"`)}
@@ -145,9 +163,17 @@ func (bc *BotCreate) createSpec() (*Bot, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
+	if value, ok := bc.mutation.BotID(); ok {
+		_spec.SetField(bot.FieldBotID, field.TypeInt64, value)
+		_node.BotID = value
+	}
 	if value, ok := bc.mutation.BotName(); ok {
 		_spec.SetField(bot.FieldBotName, field.TypeString, value)
 		_node.BotName = value
+	}
+	if value, ok := bc.mutation.SelfID(); ok {
+		_spec.SetField(bot.FieldSelfID, field.TypeInt64, value)
+		_node.SelfID = value
 	}
 	if value, ok := bc.mutation.Status(); ok {
 		_spec.SetField(bot.FieldStatus, field.TypeInt, value)

@@ -8,18 +8,6 @@ import (
 	"fmt"
 )
 
-// The BiliLiveSettingFunc type is an adapter to allow the use of ordinary
-// function as BiliLiveSetting mutator.
-type BiliLiveSettingFunc func(context.Context, *ent.BiliLiveSettingMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f BiliLiveSettingFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.BiliLiveSettingMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BiliLiveSettingMutation", m)
-}
-
 // The BotFunc type is an adapter to allow the use of ordinary
 // function as Bot mutator.
 type BotFunc func(context.Context, *ent.BotMutation) (ent.Value, error)
@@ -30,6 +18,30 @@ func (f BotFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) 
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BotMutation", m)
+}
+
+// The SubFunc type is an adapter to allow the use of ordinary
+// function as Sub mutator.
+type SubFunc func(context.Context, *ent.SubMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SubFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SubMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SubMutation", m)
+}
+
+// The SubBiliLiveFunc type is an adapter to allow the use of ordinary
+// function as SubBiliLive mutator.
+type SubBiliLiveFunc func(context.Context, *ent.SubBiliLiveMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SubBiliLiveFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SubBiliLiveMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SubBiliLiveMutation", m)
 }
 
 // Condition is a hook condition function.

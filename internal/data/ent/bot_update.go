@@ -28,6 +28,27 @@ func (bu *BotUpdate) Where(ps ...predicate.Bot) *BotUpdate {
 	return bu
 }
 
+// SetBotID sets the "bot_id" field.
+func (bu *BotUpdate) SetBotID(i int64) *BotUpdate {
+	bu.mutation.ResetBotID()
+	bu.mutation.SetBotID(i)
+	return bu
+}
+
+// SetNillableBotID sets the "bot_id" field if the given value is not nil.
+func (bu *BotUpdate) SetNillableBotID(i *int64) *BotUpdate {
+	if i != nil {
+		bu.SetBotID(*i)
+	}
+	return bu
+}
+
+// AddBotID adds i to the "bot_id" field.
+func (bu *BotUpdate) AddBotID(i int64) *BotUpdate {
+	bu.mutation.AddBotID(i)
+	return bu
+}
+
 // SetBotName sets the "bot_name" field.
 func (bu *BotUpdate) SetBotName(s string) *BotUpdate {
 	bu.mutation.SetBotName(s)
@@ -39,6 +60,27 @@ func (bu *BotUpdate) SetNillableBotName(s *string) *BotUpdate {
 	if s != nil {
 		bu.SetBotName(*s)
 	}
+	return bu
+}
+
+// SetSelfID sets the "self_id" field.
+func (bu *BotUpdate) SetSelfID(i int64) *BotUpdate {
+	bu.mutation.ResetSelfID()
+	bu.mutation.SetSelfID(i)
+	return bu
+}
+
+// SetNillableSelfID sets the "self_id" field if the given value is not nil.
+func (bu *BotUpdate) SetNillableSelfID(i *int64) *BotUpdate {
+	if i != nil {
+		bu.SetSelfID(*i)
+	}
+	return bu
+}
+
+// AddSelfID adds i to the "self_id" field.
+func (bu *BotUpdate) AddSelfID(i int64) *BotUpdate {
+	bu.mutation.AddSelfID(i)
 	return bu
 }
 
@@ -132,8 +174,20 @@ func (bu *BotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := bu.mutation.BotID(); ok {
+		_spec.SetField(bot.FieldBotID, field.TypeInt64, value)
+	}
+	if value, ok := bu.mutation.AddedBotID(); ok {
+		_spec.AddField(bot.FieldBotID, field.TypeInt64, value)
+	}
 	if value, ok := bu.mutation.BotName(); ok {
 		_spec.SetField(bot.FieldBotName, field.TypeString, value)
+	}
+	if value, ok := bu.mutation.SelfID(); ok {
+		_spec.SetField(bot.FieldSelfID, field.TypeInt64, value)
+	}
+	if value, ok := bu.mutation.AddedSelfID(); ok {
+		_spec.AddField(bot.FieldSelfID, field.TypeInt64, value)
 	}
 	if value, ok := bu.mutation.Status(); ok {
 		_spec.SetField(bot.FieldStatus, field.TypeInt, value)
@@ -167,6 +221,27 @@ type BotUpdateOne struct {
 	mutation *BotMutation
 }
 
+// SetBotID sets the "bot_id" field.
+func (buo *BotUpdateOne) SetBotID(i int64) *BotUpdateOne {
+	buo.mutation.ResetBotID()
+	buo.mutation.SetBotID(i)
+	return buo
+}
+
+// SetNillableBotID sets the "bot_id" field if the given value is not nil.
+func (buo *BotUpdateOne) SetNillableBotID(i *int64) *BotUpdateOne {
+	if i != nil {
+		buo.SetBotID(*i)
+	}
+	return buo
+}
+
+// AddBotID adds i to the "bot_id" field.
+func (buo *BotUpdateOne) AddBotID(i int64) *BotUpdateOne {
+	buo.mutation.AddBotID(i)
+	return buo
+}
+
 // SetBotName sets the "bot_name" field.
 func (buo *BotUpdateOne) SetBotName(s string) *BotUpdateOne {
 	buo.mutation.SetBotName(s)
@@ -178,6 +253,27 @@ func (buo *BotUpdateOne) SetNillableBotName(s *string) *BotUpdateOne {
 	if s != nil {
 		buo.SetBotName(*s)
 	}
+	return buo
+}
+
+// SetSelfID sets the "self_id" field.
+func (buo *BotUpdateOne) SetSelfID(i int64) *BotUpdateOne {
+	buo.mutation.ResetSelfID()
+	buo.mutation.SetSelfID(i)
+	return buo
+}
+
+// SetNillableSelfID sets the "self_id" field if the given value is not nil.
+func (buo *BotUpdateOne) SetNillableSelfID(i *int64) *BotUpdateOne {
+	if i != nil {
+		buo.SetSelfID(*i)
+	}
+	return buo
+}
+
+// AddSelfID adds i to the "self_id" field.
+func (buo *BotUpdateOne) AddSelfID(i int64) *BotUpdateOne {
+	buo.mutation.AddSelfID(i)
 	return buo
 }
 
@@ -301,8 +397,20 @@ func (buo *BotUpdateOne) sqlSave(ctx context.Context) (_node *Bot, err error) {
 			}
 		}
 	}
+	if value, ok := buo.mutation.BotID(); ok {
+		_spec.SetField(bot.FieldBotID, field.TypeInt64, value)
+	}
+	if value, ok := buo.mutation.AddedBotID(); ok {
+		_spec.AddField(bot.FieldBotID, field.TypeInt64, value)
+	}
 	if value, ok := buo.mutation.BotName(); ok {
 		_spec.SetField(bot.FieldBotName, field.TypeString, value)
+	}
+	if value, ok := buo.mutation.SelfID(); ok {
+		_spec.SetField(bot.FieldSelfID, field.TypeInt64, value)
+	}
+	if value, ok := buo.mutation.AddedSelfID(); ok {
+		_spec.AddField(bot.FieldSelfID, field.TypeInt64, value)
 	}
 	if value, ok := buo.mutation.Status(); ok {
 		_spec.SetField(bot.FieldStatus, field.TypeInt, value)

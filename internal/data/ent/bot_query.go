@@ -262,12 +262,12 @@ func (bq *BotQuery) Clone() *BotQuery {
 // Example:
 //
 //	var v []struct {
-//		BotName string `json:"bot_name,omitempty"`
+//		BotID int64 `json:"bot_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Bot.Query().
-//		GroupBy(bot.FieldBotName).
+//		GroupBy(bot.FieldBotID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (bq *BotQuery) GroupBy(field string, fields ...string) *BotGroupBy {
@@ -285,11 +285,11 @@ func (bq *BotQuery) GroupBy(field string, fields ...string) *BotGroupBy {
 // Example:
 //
 //	var v []struct {
-//		BotName string `json:"bot_name,omitempty"`
+//		BotID int64 `json:"bot_id,omitempty"`
 //	}
 //
 //	client.Bot.Query().
-//		Select(bot.FieldBotName).
+//		Select(bot.FieldBotID).
 //		Scan(ctx, &v)
 func (bq *BotQuery) Select(fields ...string) *BotSelect {
 	bq.ctx.Fields = append(bq.ctx.Fields, fields...)

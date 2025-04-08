@@ -12,10 +12,12 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// BiliLiveSetting is the client for interacting with the BiliLiveSetting builders.
-	BiliLiveSetting *BiliLiveSettingClient
 	// Bot is the client for interacting with the Bot builders.
 	Bot *BotClient
+	// Sub is the client for interacting with the Sub builders.
+	Sub *SubClient
+	// SubBiliLive is the client for interacting with the SubBiliLive builders.
+	SubBiliLive *SubBiliLiveClient
 
 	// lazily loaded.
 	client     *Client
@@ -147,8 +149,9 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.BiliLiveSetting = NewBiliLiveSettingClient(tx.config)
 	tx.Bot = NewBotClient(tx.config)
+	tx.Sub = NewSubClient(tx.config)
+	tx.SubBiliLive = NewSubBiliLiveClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -158,7 +161,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: BiliLiveSetting.QueryXXX(), the query will be executed
+// applies a query, for example: Bot.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

@@ -11,8 +11,9 @@ import (
 
 	"echo/internal/data/ent/migrate"
 
-	"echo/internal/data/ent/bililivesetting"
 	"echo/internal/data/ent/bot"
+	"echo/internal/data/ent/sub"
+	"echo/internal/data/ent/subbililive"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -24,10 +25,12 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// BiliLiveSetting is the client for interacting with the BiliLiveSetting builders.
-	BiliLiveSetting *BiliLiveSettingClient
 	// Bot is the client for interacting with the Bot builders.
 	Bot *BotClient
+	// Sub is the client for interacting with the Sub builders.
+	Sub *SubClient
+	// SubBiliLive is the client for interacting with the SubBiliLive builders.
+	SubBiliLive *SubBiliLiveClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -39,8 +42,9 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.BiliLiveSetting = NewBiliLiveSettingClient(c.config)
 	c.Bot = NewBotClient(c.config)
+	c.Sub = NewSubClient(c.config)
+	c.SubBiliLive = NewSubBiliLiveClient(c.config)
 }
 
 type (
@@ -131,10 +135,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		BiliLiveSetting: NewBiliLiveSettingClient(cfg),
-		Bot:             NewBotClient(cfg),
+		ctx:         ctx,
+		config:      cfg,
+		Bot:         NewBotClient(cfg),
+		Sub:         NewSubClient(cfg),
+		SubBiliLive: NewSubBiliLiveClient(cfg),
 	}, nil
 }
 
@@ -152,17 +157,18 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		BiliLiveSetting: NewBiliLiveSettingClient(cfg),
-		Bot:             NewBotClient(cfg),
+		ctx:         ctx,
+		config:      cfg,
+		Bot:         NewBotClient(cfg),
+		Sub:         NewSubClient(cfg),
+		SubBiliLive: NewSubBiliLiveClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		BiliLiveSetting.
+//		Bot.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -184,159 +190,30 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.BiliLiveSetting.Use(hooks...)
 	c.Bot.Use(hooks...)
+	c.Sub.Use(hooks...)
+	c.SubBiliLive.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.BiliLiveSetting.Intercept(interceptors...)
 	c.Bot.Intercept(interceptors...)
+	c.Sub.Intercept(interceptors...)
+	c.SubBiliLive.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
-	case *BiliLiveSettingMutation:
-		return c.BiliLiveSetting.mutate(ctx, m)
 	case *BotMutation:
 		return c.Bot.mutate(ctx, m)
+	case *SubMutation:
+		return c.Sub.mutate(ctx, m)
+	case *SubBiliLiveMutation:
+		return c.SubBiliLive.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
-	}
-}
-
-// BiliLiveSettingClient is a client for the BiliLiveSetting schema.
-type BiliLiveSettingClient struct {
-	config
-}
-
-// NewBiliLiveSettingClient returns a client for the BiliLiveSetting from the given config.
-func NewBiliLiveSettingClient(c config) *BiliLiveSettingClient {
-	return &BiliLiveSettingClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `bililivesetting.Hooks(f(g(h())))`.
-func (c *BiliLiveSettingClient) Use(hooks ...Hook) {
-	c.hooks.BiliLiveSetting = append(c.hooks.BiliLiveSetting, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `bililivesetting.Intercept(f(g(h())))`.
-func (c *BiliLiveSettingClient) Intercept(interceptors ...Interceptor) {
-	c.inters.BiliLiveSetting = append(c.inters.BiliLiveSetting, interceptors...)
-}
-
-// Create returns a builder for creating a BiliLiveSetting entity.
-func (c *BiliLiveSettingClient) Create() *BiliLiveSettingCreate {
-	mutation := newBiliLiveSettingMutation(c.config, OpCreate)
-	return &BiliLiveSettingCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of BiliLiveSetting entities.
-func (c *BiliLiveSettingClient) CreateBulk(builders ...*BiliLiveSettingCreate) *BiliLiveSettingCreateBulk {
-	return &BiliLiveSettingCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *BiliLiveSettingClient) MapCreateBulk(slice any, setFunc func(*BiliLiveSettingCreate, int)) *BiliLiveSettingCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &BiliLiveSettingCreateBulk{err: fmt.Errorf("calling to BiliLiveSettingClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*BiliLiveSettingCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &BiliLiveSettingCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for BiliLiveSetting.
-func (c *BiliLiveSettingClient) Update() *BiliLiveSettingUpdate {
-	mutation := newBiliLiveSettingMutation(c.config, OpUpdate)
-	return &BiliLiveSettingUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *BiliLiveSettingClient) UpdateOne(bls *BiliLiveSetting) *BiliLiveSettingUpdateOne {
-	mutation := newBiliLiveSettingMutation(c.config, OpUpdateOne, withBiliLiveSetting(bls))
-	return &BiliLiveSettingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *BiliLiveSettingClient) UpdateOneID(id int64) *BiliLiveSettingUpdateOne {
-	mutation := newBiliLiveSettingMutation(c.config, OpUpdateOne, withBiliLiveSettingID(id))
-	return &BiliLiveSettingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for BiliLiveSetting.
-func (c *BiliLiveSettingClient) Delete() *BiliLiveSettingDelete {
-	mutation := newBiliLiveSettingMutation(c.config, OpDelete)
-	return &BiliLiveSettingDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *BiliLiveSettingClient) DeleteOne(bls *BiliLiveSetting) *BiliLiveSettingDeleteOne {
-	return c.DeleteOneID(bls.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *BiliLiveSettingClient) DeleteOneID(id int64) *BiliLiveSettingDeleteOne {
-	builder := c.Delete().Where(bililivesetting.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &BiliLiveSettingDeleteOne{builder}
-}
-
-// Query returns a query builder for BiliLiveSetting.
-func (c *BiliLiveSettingClient) Query() *BiliLiveSettingQuery {
-	return &BiliLiveSettingQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeBiliLiveSetting},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a BiliLiveSetting entity by its id.
-func (c *BiliLiveSettingClient) Get(ctx context.Context, id int64) (*BiliLiveSetting, error) {
-	return c.Query().Where(bililivesetting.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *BiliLiveSettingClient) GetX(ctx context.Context, id int64) *BiliLiveSetting {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *BiliLiveSettingClient) Hooks() []Hook {
-	return c.hooks.BiliLiveSetting
-}
-
-// Interceptors returns the client interceptors.
-func (c *BiliLiveSettingClient) Interceptors() []Interceptor {
-	return c.inters.BiliLiveSetting
-}
-
-func (c *BiliLiveSettingClient) mutate(ctx context.Context, m *BiliLiveSettingMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&BiliLiveSettingCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&BiliLiveSettingUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&BiliLiveSettingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&BiliLiveSettingDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown BiliLiveSetting mutation op: %q", m.Op())
 	}
 }
 
@@ -473,12 +350,278 @@ func (c *BotClient) mutate(ctx context.Context, m *BotMutation) (Value, error) {
 	}
 }
 
+// SubClient is a client for the Sub schema.
+type SubClient struct {
+	config
+}
+
+// NewSubClient returns a client for the Sub from the given config.
+func NewSubClient(c config) *SubClient {
+	return &SubClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `sub.Hooks(f(g(h())))`.
+func (c *SubClient) Use(hooks ...Hook) {
+	c.hooks.Sub = append(c.hooks.Sub, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `sub.Intercept(f(g(h())))`.
+func (c *SubClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Sub = append(c.inters.Sub, interceptors...)
+}
+
+// Create returns a builder for creating a Sub entity.
+func (c *SubClient) Create() *SubCreate {
+	mutation := newSubMutation(c.config, OpCreate)
+	return &SubCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Sub entities.
+func (c *SubClient) CreateBulk(builders ...*SubCreate) *SubCreateBulk {
+	return &SubCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SubClient) MapCreateBulk(slice any, setFunc func(*SubCreate, int)) *SubCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SubCreateBulk{err: fmt.Errorf("calling to SubClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SubCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SubCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Sub.
+func (c *SubClient) Update() *SubUpdate {
+	mutation := newSubMutation(c.config, OpUpdate)
+	return &SubUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SubClient) UpdateOne(s *Sub) *SubUpdateOne {
+	mutation := newSubMutation(c.config, OpUpdateOne, withSub(s))
+	return &SubUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SubClient) UpdateOneID(id int64) *SubUpdateOne {
+	mutation := newSubMutation(c.config, OpUpdateOne, withSubID(id))
+	return &SubUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Sub.
+func (c *SubClient) Delete() *SubDelete {
+	mutation := newSubMutation(c.config, OpDelete)
+	return &SubDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SubClient) DeleteOne(s *Sub) *SubDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SubClient) DeleteOneID(id int64) *SubDeleteOne {
+	builder := c.Delete().Where(sub.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SubDeleteOne{builder}
+}
+
+// Query returns a query builder for Sub.
+func (c *SubClient) Query() *SubQuery {
+	return &SubQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSub},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Sub entity by its id.
+func (c *SubClient) Get(ctx context.Context, id int64) (*Sub, error) {
+	return c.Query().Where(sub.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SubClient) GetX(ctx context.Context, id int64) *Sub {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *SubClient) Hooks() []Hook {
+	return c.hooks.Sub
+}
+
+// Interceptors returns the client interceptors.
+func (c *SubClient) Interceptors() []Interceptor {
+	return c.inters.Sub
+}
+
+func (c *SubClient) mutate(ctx context.Context, m *SubMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SubCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SubUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SubUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SubDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Sub mutation op: %q", m.Op())
+	}
+}
+
+// SubBiliLiveClient is a client for the SubBiliLive schema.
+type SubBiliLiveClient struct {
+	config
+}
+
+// NewSubBiliLiveClient returns a client for the SubBiliLive from the given config.
+func NewSubBiliLiveClient(c config) *SubBiliLiveClient {
+	return &SubBiliLiveClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `subbililive.Hooks(f(g(h())))`.
+func (c *SubBiliLiveClient) Use(hooks ...Hook) {
+	c.hooks.SubBiliLive = append(c.hooks.SubBiliLive, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `subbililive.Intercept(f(g(h())))`.
+func (c *SubBiliLiveClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SubBiliLive = append(c.inters.SubBiliLive, interceptors...)
+}
+
+// Create returns a builder for creating a SubBiliLive entity.
+func (c *SubBiliLiveClient) Create() *SubBiliLiveCreate {
+	mutation := newSubBiliLiveMutation(c.config, OpCreate)
+	return &SubBiliLiveCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SubBiliLive entities.
+func (c *SubBiliLiveClient) CreateBulk(builders ...*SubBiliLiveCreate) *SubBiliLiveCreateBulk {
+	return &SubBiliLiveCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SubBiliLiveClient) MapCreateBulk(slice any, setFunc func(*SubBiliLiveCreate, int)) *SubBiliLiveCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SubBiliLiveCreateBulk{err: fmt.Errorf("calling to SubBiliLiveClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SubBiliLiveCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SubBiliLiveCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SubBiliLive.
+func (c *SubBiliLiveClient) Update() *SubBiliLiveUpdate {
+	mutation := newSubBiliLiveMutation(c.config, OpUpdate)
+	return &SubBiliLiveUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SubBiliLiveClient) UpdateOne(sbl *SubBiliLive) *SubBiliLiveUpdateOne {
+	mutation := newSubBiliLiveMutation(c.config, OpUpdateOne, withSubBiliLive(sbl))
+	return &SubBiliLiveUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SubBiliLiveClient) UpdateOneID(id int64) *SubBiliLiveUpdateOne {
+	mutation := newSubBiliLiveMutation(c.config, OpUpdateOne, withSubBiliLiveID(id))
+	return &SubBiliLiveUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SubBiliLive.
+func (c *SubBiliLiveClient) Delete() *SubBiliLiveDelete {
+	mutation := newSubBiliLiveMutation(c.config, OpDelete)
+	return &SubBiliLiveDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SubBiliLiveClient) DeleteOne(sbl *SubBiliLive) *SubBiliLiveDeleteOne {
+	return c.DeleteOneID(sbl.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SubBiliLiveClient) DeleteOneID(id int64) *SubBiliLiveDeleteOne {
+	builder := c.Delete().Where(subbililive.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SubBiliLiveDeleteOne{builder}
+}
+
+// Query returns a query builder for SubBiliLive.
+func (c *SubBiliLiveClient) Query() *SubBiliLiveQuery {
+	return &SubBiliLiveQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSubBiliLive},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SubBiliLive entity by its id.
+func (c *SubBiliLiveClient) Get(ctx context.Context, id int64) (*SubBiliLive, error) {
+	return c.Query().Where(subbililive.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SubBiliLiveClient) GetX(ctx context.Context, id int64) *SubBiliLive {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *SubBiliLiveClient) Hooks() []Hook {
+	return c.hooks.SubBiliLive
+}
+
+// Interceptors returns the client interceptors.
+func (c *SubBiliLiveClient) Interceptors() []Interceptor {
+	return c.inters.SubBiliLive
+}
+
+func (c *SubBiliLiveClient) mutate(ctx context.Context, m *SubBiliLiveMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SubBiliLiveCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SubBiliLiveUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SubBiliLiveUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SubBiliLiveDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown SubBiliLive mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		BiliLiveSetting, Bot []ent.Hook
+		Bot, Sub, SubBiliLive []ent.Hook
 	}
 	inters struct {
-		BiliLiveSetting, Bot []ent.Interceptor
+		Bot, Sub, SubBiliLive []ent.Interceptor
 	}
 )

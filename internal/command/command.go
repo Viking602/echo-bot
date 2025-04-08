@@ -2,20 +2,24 @@ package command
 
 import (
 	"echo/internal/model"
+	"echo/internal/registry"
+	"echo/internal/service"
+	"github.com/google/wire"
 )
 
-// Command 定义指令结构
-type Command struct {
-	Name    string
-	Handler func(msg *model.OneBotMessage) (string, error)
-}
+var ProviderSet = wire.NewSet(
+	NewEchoCommand,
+	NewInitializedRegistry,
+)
 
-// RegistrarCommand 定义指令注册器接口
-type RegistrarCommand interface {
-	Register(registry Registrar)
-}
+func NewInitializedRegistry(echoService *service.EchoService) *registry.CommandRegistry {
+	reg := registry.NewCommandRegistry()
+	registrars := []model.CommandRegistrar{
+		NewEchoCommand(echoService),
+	}
 
-// Registrar 定义注册表接口（供 command 使用）
-type Registrar interface {
-	Register(cmd Command)
+	for _, registrar := range registrars {
+		registrar.Register(reg)
+	}
+	return reg
 }

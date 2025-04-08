@@ -5,6 +5,7 @@ package ent
 import (
 	"echo/internal/data/ent/bot"
 	"echo/internal/data/ent/schema"
+	"echo/internal/data/ent/sub"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -14,7 +15,13 @@ func init() {
 	botFields := schema.Bot{}.Fields()
 	_ = botFields
 	// botDescStatus is the schema descriptor for status field.
-	botDescStatus := botFields[2].Descriptor()
+	botDescStatus := botFields[4].Descriptor()
 	// bot.DefaultStatus holds the default value on creation for the status field.
 	bot.DefaultStatus = botDescStatus.Default.(int)
+	subFields := schema.Sub{}.Fields()
+	_ = subFields
+	// subDescStatus is the schema descriptor for status field.
+	subDescStatus := subFields[5].Descriptor()
+	// sub.DefaultStatus holds the default value on creation for the status field.
+	sub.DefaultStatus = subDescStatus.Default.(int)
 }

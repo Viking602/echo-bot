@@ -5,25 +5,26 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// Bot holds the schema definition for the Bot entity.
-type Bot struct {
+// Sub holds the schema definition for the Sub entity.
+type Sub struct {
 	ent.Schema
 }
 
-// Fields of the Bot.
-func (Bot) Fields() []ent.Field {
+// Fields of the Sub.
+func (Sub) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").Unique(),
+		field.Int64("sub_type"),
+		field.Int64("group_id"),
+		field.Int64("sub_id"),
 		field.Int64("bot_id"),
-		field.String("bot_name"),
-		field.Int64("self_id"),
 		field.Int("status").Default(1),
 		field.Time("create_time"),
 		field.Time("update_time"),
 	}
 }
 
-// Edges of the Bot.
-func (Bot) Edges() []ent.Edge {
+// Edges of the Sub.
+func (Sub) Edges() []ent.Edge {
 	return nil
 }

@@ -6,8 +6,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// BiliLiveSetting is the predicate function for bililivesetting builders.
-type BiliLiveSetting func(*sql.Selector)
-
 // Bot is the predicate function for bot builders.
 type Bot func(*sql.Selector)
+
+// Sub is the predicate function for sub builders.
+type Sub func(*sql.Selector)
+
+// SubBiliLive is the predicate function for subbililive builders.
+type SubBiliLive func(*sql.Selector)

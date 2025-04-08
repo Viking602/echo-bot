@@ -1,17 +1,40 @@
 package model
 
-// Command 定义指令结构
+// Scope 定义命令适用范围
+type Scope int
+
+const (
+	ScopePrivate Scope = 1 << iota // 私聊
+	ScopeGroup                     // 群聊
+	ScopeAll     = ScopePrivate | ScopeGroup
+)
+
+// Command 定义命令结构，支持子命令和适用范围
 type Command struct {
-	Name    string
-	Handler func(msg *OneBotMessage) string
+	Name     string
+	Handler  func(msg *OneBotMessage, args []string) string
+	Children map[string]*Command
+	Scope    Scope // 新增：命令适用范围
 }
 
-// CommandRegistrar 定义指令注册器接口
+func NewCommand(name string, handler func(msg *OneBotMessage, args []string) string, scope Scope) *Command {
+	return &Command{
+		Name:     name,
+		Handler:  handler,
+		Children: make(map[string]*Command),
+		Scope:    scope,
+	}
+}
+
+// AddChild 添加子命令
+func (c *Command) AddChild(child *Command) {
+	c.Children[child.Name] = child
+}
+
 type CommandRegistrar interface {
 	Register(registry Registrar)
 }
 
-// Registrar 定义注册表接口（供 command 使用）
 type Registrar interface {
-	Register(cmd Command)
+	Register(cmd *Command)
 }

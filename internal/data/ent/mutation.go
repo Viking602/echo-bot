@@ -4,9 +4,10 @@ package ent
 
 import (
 	"context"
-	"echo/internal/data/ent/bililivesetting"
 	"echo/internal/data/ent/bot"
 	"echo/internal/data/ent/predicate"
+	"echo/internal/data/ent/sub"
+	"echo/internal/data/ent/subbililive"
 	"errors"
 	"fmt"
 	"sync"
@@ -25,680 +26,10 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeBiliLiveSetting = "BiliLiveSetting"
-	TypeBot             = "Bot"
+	TypeBot         = "Bot"
+	TypeSub         = "Sub"
+	TypeSubBiliLive = "SubBiliLive"
 )
-
-// BiliLiveSettingMutation represents an operation that mutates the BiliLiveSetting nodes in the graph.
-type BiliLiveSettingMutation struct {
-	config
-	op              Op
-	typ             string
-	id              *int64
-	room_id         *int64
-	addroom_id      *int64
-	live_state      *int64
-	addlive_state   *int64
-	live_start_time *time.Time
-	live_end_time   *time.Time
-	create_time     *time.Time
-	update_time     *time.Time
-	clearedFields   map[string]struct{}
-	done            bool
-	oldValue        func(context.Context) (*BiliLiveSetting, error)
-	predicates      []predicate.BiliLiveSetting
-}
-
-var _ ent.Mutation = (*BiliLiveSettingMutation)(nil)
-
-// bililivesettingOption allows management of the mutation configuration using functional options.
-type bililivesettingOption func(*BiliLiveSettingMutation)
-
-// newBiliLiveSettingMutation creates new mutation for the BiliLiveSetting entity.
-func newBiliLiveSettingMutation(c config, op Op, opts ...bililivesettingOption) *BiliLiveSettingMutation {
-	m := &BiliLiveSettingMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeBiliLiveSetting,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withBiliLiveSettingID sets the ID field of the mutation.
-func withBiliLiveSettingID(id int64) bililivesettingOption {
-	return func(m *BiliLiveSettingMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *BiliLiveSetting
-		)
-		m.oldValue = func(ctx context.Context) (*BiliLiveSetting, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().BiliLiveSetting.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withBiliLiveSetting sets the old BiliLiveSetting of the mutation.
-func withBiliLiveSetting(node *BiliLiveSetting) bililivesettingOption {
-	return func(m *BiliLiveSettingMutation) {
-		m.oldValue = func(context.Context) (*BiliLiveSetting, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m BiliLiveSettingMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m BiliLiveSettingMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of BiliLiveSetting entities.
-func (m *BiliLiveSettingMutation) SetID(id int64) {
-	m.id = &id
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *BiliLiveSettingMutation) ID() (id int64, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *BiliLiveSettingMutation) IDs(ctx context.Context) ([]int64, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []int64{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().BiliLiveSetting.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetRoomID sets the "room_id" field.
-func (m *BiliLiveSettingMutation) SetRoomID(i int64) {
-	m.room_id = &i
-	m.addroom_id = nil
-}
-
-// RoomID returns the value of the "room_id" field in the mutation.
-func (m *BiliLiveSettingMutation) RoomID() (r int64, exists bool) {
-	v := m.room_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRoomID returns the old "room_id" field's value of the BiliLiveSetting entity.
-// If the BiliLiveSetting object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BiliLiveSettingMutation) OldRoomID(ctx context.Context) (v int64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRoomID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRoomID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRoomID: %w", err)
-	}
-	return oldValue.RoomID, nil
-}
-
-// AddRoomID adds i to the "room_id" field.
-func (m *BiliLiveSettingMutation) AddRoomID(i int64) {
-	if m.addroom_id != nil {
-		*m.addroom_id += i
-	} else {
-		m.addroom_id = &i
-	}
-}
-
-// AddedRoomID returns the value that was added to the "room_id" field in this mutation.
-func (m *BiliLiveSettingMutation) AddedRoomID() (r int64, exists bool) {
-	v := m.addroom_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetRoomID resets all changes to the "room_id" field.
-func (m *BiliLiveSettingMutation) ResetRoomID() {
-	m.room_id = nil
-	m.addroom_id = nil
-}
-
-// SetLiveState sets the "live_state" field.
-func (m *BiliLiveSettingMutation) SetLiveState(i int64) {
-	m.live_state = &i
-	m.addlive_state = nil
-}
-
-// LiveState returns the value of the "live_state" field in the mutation.
-func (m *BiliLiveSettingMutation) LiveState() (r int64, exists bool) {
-	v := m.live_state
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLiveState returns the old "live_state" field's value of the BiliLiveSetting entity.
-// If the BiliLiveSetting object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BiliLiveSettingMutation) OldLiveState(ctx context.Context) (v int64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLiveState is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLiveState requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLiveState: %w", err)
-	}
-	return oldValue.LiveState, nil
-}
-
-// AddLiveState adds i to the "live_state" field.
-func (m *BiliLiveSettingMutation) AddLiveState(i int64) {
-	if m.addlive_state != nil {
-		*m.addlive_state += i
-	} else {
-		m.addlive_state = &i
-	}
-}
-
-// AddedLiveState returns the value that was added to the "live_state" field in this mutation.
-func (m *BiliLiveSettingMutation) AddedLiveState() (r int64, exists bool) {
-	v := m.addlive_state
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetLiveState resets all changes to the "live_state" field.
-func (m *BiliLiveSettingMutation) ResetLiveState() {
-	m.live_state = nil
-	m.addlive_state = nil
-}
-
-// SetLiveStartTime sets the "live_start_time" field.
-func (m *BiliLiveSettingMutation) SetLiveStartTime(t time.Time) {
-	m.live_start_time = &t
-}
-
-// LiveStartTime returns the value of the "live_start_time" field in the mutation.
-func (m *BiliLiveSettingMutation) LiveStartTime() (r time.Time, exists bool) {
-	v := m.live_start_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLiveStartTime returns the old "live_start_time" field's value of the BiliLiveSetting entity.
-// If the BiliLiveSetting object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BiliLiveSettingMutation) OldLiveStartTime(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLiveStartTime is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLiveStartTime requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLiveStartTime: %w", err)
-	}
-	return oldValue.LiveStartTime, nil
-}
-
-// ResetLiveStartTime resets all changes to the "live_start_time" field.
-func (m *BiliLiveSettingMutation) ResetLiveStartTime() {
-	m.live_start_time = nil
-}
-
-// SetLiveEndTime sets the "live_end_time" field.
-func (m *BiliLiveSettingMutation) SetLiveEndTime(t time.Time) {
-	m.live_end_time = &t
-}
-
-// LiveEndTime returns the value of the "live_end_time" field in the mutation.
-func (m *BiliLiveSettingMutation) LiveEndTime() (r time.Time, exists bool) {
-	v := m.live_end_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLiveEndTime returns the old "live_end_time" field's value of the BiliLiveSetting entity.
-// If the BiliLiveSetting object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BiliLiveSettingMutation) OldLiveEndTime(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLiveEndTime is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLiveEndTime requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLiveEndTime: %w", err)
-	}
-	return oldValue.LiveEndTime, nil
-}
-
-// ResetLiveEndTime resets all changes to the "live_end_time" field.
-func (m *BiliLiveSettingMutation) ResetLiveEndTime() {
-	m.live_end_time = nil
-}
-
-// SetCreateTime sets the "create_time" field.
-func (m *BiliLiveSettingMutation) SetCreateTime(t time.Time) {
-	m.create_time = &t
-}
-
-// CreateTime returns the value of the "create_time" field in the mutation.
-func (m *BiliLiveSettingMutation) CreateTime() (r time.Time, exists bool) {
-	v := m.create_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCreateTime returns the old "create_time" field's value of the BiliLiveSetting entity.
-// If the BiliLiveSetting object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BiliLiveSettingMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCreateTime requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
-	}
-	return oldValue.CreateTime, nil
-}
-
-// ResetCreateTime resets all changes to the "create_time" field.
-func (m *BiliLiveSettingMutation) ResetCreateTime() {
-	m.create_time = nil
-}
-
-// SetUpdateTime sets the "update_time" field.
-func (m *BiliLiveSettingMutation) SetUpdateTime(t time.Time) {
-	m.update_time = &t
-}
-
-// UpdateTime returns the value of the "update_time" field in the mutation.
-func (m *BiliLiveSettingMutation) UpdateTime() (r time.Time, exists bool) {
-	v := m.update_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUpdateTime returns the old "update_time" field's value of the BiliLiveSetting entity.
-// If the BiliLiveSetting object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BiliLiveSettingMutation) OldUpdateTime(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUpdateTime requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUpdateTime: %w", err)
-	}
-	return oldValue.UpdateTime, nil
-}
-
-// ResetUpdateTime resets all changes to the "update_time" field.
-func (m *BiliLiveSettingMutation) ResetUpdateTime() {
-	m.update_time = nil
-}
-
-// Where appends a list predicates to the BiliLiveSettingMutation builder.
-func (m *BiliLiveSettingMutation) Where(ps ...predicate.BiliLiveSetting) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the BiliLiveSettingMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *BiliLiveSettingMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.BiliLiveSetting, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *BiliLiveSettingMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *BiliLiveSettingMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (BiliLiveSetting).
-func (m *BiliLiveSettingMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *BiliLiveSettingMutation) Fields() []string {
-	fields := make([]string, 0, 6)
-	if m.room_id != nil {
-		fields = append(fields, bililivesetting.FieldRoomID)
-	}
-	if m.live_state != nil {
-		fields = append(fields, bililivesetting.FieldLiveState)
-	}
-	if m.live_start_time != nil {
-		fields = append(fields, bililivesetting.FieldLiveStartTime)
-	}
-	if m.live_end_time != nil {
-		fields = append(fields, bililivesetting.FieldLiveEndTime)
-	}
-	if m.create_time != nil {
-		fields = append(fields, bililivesetting.FieldCreateTime)
-	}
-	if m.update_time != nil {
-		fields = append(fields, bililivesetting.FieldUpdateTime)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *BiliLiveSettingMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case bililivesetting.FieldRoomID:
-		return m.RoomID()
-	case bililivesetting.FieldLiveState:
-		return m.LiveState()
-	case bililivesetting.FieldLiveStartTime:
-		return m.LiveStartTime()
-	case bililivesetting.FieldLiveEndTime:
-		return m.LiveEndTime()
-	case bililivesetting.FieldCreateTime:
-		return m.CreateTime()
-	case bililivesetting.FieldUpdateTime:
-		return m.UpdateTime()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *BiliLiveSettingMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case bililivesetting.FieldRoomID:
-		return m.OldRoomID(ctx)
-	case bililivesetting.FieldLiveState:
-		return m.OldLiveState(ctx)
-	case bililivesetting.FieldLiveStartTime:
-		return m.OldLiveStartTime(ctx)
-	case bililivesetting.FieldLiveEndTime:
-		return m.OldLiveEndTime(ctx)
-	case bililivesetting.FieldCreateTime:
-		return m.OldCreateTime(ctx)
-	case bililivesetting.FieldUpdateTime:
-		return m.OldUpdateTime(ctx)
-	}
-	return nil, fmt.Errorf("unknown BiliLiveSetting field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *BiliLiveSettingMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case bililivesetting.FieldRoomID:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetRoomID(v)
-		return nil
-	case bililivesetting.FieldLiveState:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLiveState(v)
-		return nil
-	case bililivesetting.FieldLiveStartTime:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLiveStartTime(v)
-		return nil
-	case bililivesetting.FieldLiveEndTime:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLiveEndTime(v)
-		return nil
-	case bililivesetting.FieldCreateTime:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCreateTime(v)
-		return nil
-	case bililivesetting.FieldUpdateTime:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUpdateTime(v)
-		return nil
-	}
-	return fmt.Errorf("unknown BiliLiveSetting field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *BiliLiveSettingMutation) AddedFields() []string {
-	var fields []string
-	if m.addroom_id != nil {
-		fields = append(fields, bililivesetting.FieldRoomID)
-	}
-	if m.addlive_state != nil {
-		fields = append(fields, bililivesetting.FieldLiveState)
-	}
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *BiliLiveSettingMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case bililivesetting.FieldRoomID:
-		return m.AddedRoomID()
-	case bililivesetting.FieldLiveState:
-		return m.AddedLiveState()
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *BiliLiveSettingMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	case bililivesetting.FieldRoomID:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddRoomID(v)
-		return nil
-	case bililivesetting.FieldLiveState:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddLiveState(v)
-		return nil
-	}
-	return fmt.Errorf("unknown BiliLiveSetting numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *BiliLiveSettingMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *BiliLiveSettingMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *BiliLiveSettingMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown BiliLiveSetting nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *BiliLiveSettingMutation) ResetField(name string) error {
-	switch name {
-	case bililivesetting.FieldRoomID:
-		m.ResetRoomID()
-		return nil
-	case bililivesetting.FieldLiveState:
-		m.ResetLiveState()
-		return nil
-	case bililivesetting.FieldLiveStartTime:
-		m.ResetLiveStartTime()
-		return nil
-	case bililivesetting.FieldLiveEndTime:
-		m.ResetLiveEndTime()
-		return nil
-	case bililivesetting.FieldCreateTime:
-		m.ResetCreateTime()
-		return nil
-	case bililivesetting.FieldUpdateTime:
-		m.ResetUpdateTime()
-		return nil
-	}
-	return fmt.Errorf("unknown BiliLiveSetting field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *BiliLiveSettingMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *BiliLiveSettingMutation) AddedIDs(name string) []ent.Value {
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *BiliLiveSettingMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *BiliLiveSettingMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *BiliLiveSettingMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *BiliLiveSettingMutation) EdgeCleared(name string) bool {
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *BiliLiveSettingMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown BiliLiveSetting unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *BiliLiveSettingMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown BiliLiveSetting edge %s", name)
-}
 
 // BotMutation represents an operation that mutates the Bot nodes in the graph.
 type BotMutation struct {
@@ -706,7 +37,11 @@ type BotMutation struct {
 	op            Op
 	typ           string
 	id            *int64
+	bot_id        *int64
+	addbot_id     *int64
 	bot_name      *string
+	self_id       *int64
+	addself_id    *int64
 	status        *int
 	addstatus     *int
 	create_time   *time.Time
@@ -821,6 +156,62 @@ func (m *BotMutation) IDs(ctx context.Context) ([]int64, error) {
 	}
 }
 
+// SetBotID sets the "bot_id" field.
+func (m *BotMutation) SetBotID(i int64) {
+	m.bot_id = &i
+	m.addbot_id = nil
+}
+
+// BotID returns the value of the "bot_id" field in the mutation.
+func (m *BotMutation) BotID() (r int64, exists bool) {
+	v := m.bot_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBotID returns the old "bot_id" field's value of the Bot entity.
+// If the Bot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BotMutation) OldBotID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBotID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBotID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBotID: %w", err)
+	}
+	return oldValue.BotID, nil
+}
+
+// AddBotID adds i to the "bot_id" field.
+func (m *BotMutation) AddBotID(i int64) {
+	if m.addbot_id != nil {
+		*m.addbot_id += i
+	} else {
+		m.addbot_id = &i
+	}
+}
+
+// AddedBotID returns the value that was added to the "bot_id" field in this mutation.
+func (m *BotMutation) AddedBotID() (r int64, exists bool) {
+	v := m.addbot_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetBotID resets all changes to the "bot_id" field.
+func (m *BotMutation) ResetBotID() {
+	m.bot_id = nil
+	m.addbot_id = nil
+}
+
 // SetBotName sets the "bot_name" field.
 func (m *BotMutation) SetBotName(s string) {
 	m.bot_name = &s
@@ -855,6 +246,62 @@ func (m *BotMutation) OldBotName(ctx context.Context) (v string, err error) {
 // ResetBotName resets all changes to the "bot_name" field.
 func (m *BotMutation) ResetBotName() {
 	m.bot_name = nil
+}
+
+// SetSelfID sets the "self_id" field.
+func (m *BotMutation) SetSelfID(i int64) {
+	m.self_id = &i
+	m.addself_id = nil
+}
+
+// SelfID returns the value of the "self_id" field in the mutation.
+func (m *BotMutation) SelfID() (r int64, exists bool) {
+	v := m.self_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSelfID returns the old "self_id" field's value of the Bot entity.
+// If the Bot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BotMutation) OldSelfID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSelfID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSelfID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSelfID: %w", err)
+	}
+	return oldValue.SelfID, nil
+}
+
+// AddSelfID adds i to the "self_id" field.
+func (m *BotMutation) AddSelfID(i int64) {
+	if m.addself_id != nil {
+		*m.addself_id += i
+	} else {
+		m.addself_id = &i
+	}
+}
+
+// AddedSelfID returns the value that was added to the "self_id" field in this mutation.
+func (m *BotMutation) AddedSelfID() (r int64, exists bool) {
+	v := m.addself_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSelfID resets all changes to the "self_id" field.
+func (m *BotMutation) ResetSelfID() {
+	m.self_id = nil
+	m.addself_id = nil
 }
 
 // SetStatus sets the "status" field.
@@ -1019,9 +466,15 @@ func (m *BotMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BotMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 6)
+	if m.bot_id != nil {
+		fields = append(fields, bot.FieldBotID)
+	}
 	if m.bot_name != nil {
 		fields = append(fields, bot.FieldBotName)
+	}
+	if m.self_id != nil {
+		fields = append(fields, bot.FieldSelfID)
 	}
 	if m.status != nil {
 		fields = append(fields, bot.FieldStatus)
@@ -1040,8 +493,12 @@ func (m *BotMutation) Fields() []string {
 // schema.
 func (m *BotMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case bot.FieldBotID:
+		return m.BotID()
 	case bot.FieldBotName:
 		return m.BotName()
+	case bot.FieldSelfID:
+		return m.SelfID()
 	case bot.FieldStatus:
 		return m.Status()
 	case bot.FieldCreateTime:
@@ -1057,8 +514,12 @@ func (m *BotMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *BotMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case bot.FieldBotID:
+		return m.OldBotID(ctx)
 	case bot.FieldBotName:
 		return m.OldBotName(ctx)
+	case bot.FieldSelfID:
+		return m.OldSelfID(ctx)
 	case bot.FieldStatus:
 		return m.OldStatus(ctx)
 	case bot.FieldCreateTime:
@@ -1074,12 +535,26 @@ func (m *BotMutation) OldField(ctx context.Context, name string) (ent.Value, err
 // type.
 func (m *BotMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case bot.FieldBotID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBotID(v)
+		return nil
 	case bot.FieldBotName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetBotName(v)
+		return nil
+	case bot.FieldSelfID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSelfID(v)
 		return nil
 	case bot.FieldStatus:
 		v, ok := value.(int)
@@ -1110,6 +585,12 @@ func (m *BotMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *BotMutation) AddedFields() []string {
 	var fields []string
+	if m.addbot_id != nil {
+		fields = append(fields, bot.FieldBotID)
+	}
+	if m.addself_id != nil {
+		fields = append(fields, bot.FieldSelfID)
+	}
 	if m.addstatus != nil {
 		fields = append(fields, bot.FieldStatus)
 	}
@@ -1121,6 +602,10 @@ func (m *BotMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *BotMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case bot.FieldBotID:
+		return m.AddedBotID()
+	case bot.FieldSelfID:
+		return m.AddedSelfID()
 	case bot.FieldStatus:
 		return m.AddedStatus()
 	}
@@ -1132,6 +617,20 @@ func (m *BotMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *BotMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case bot.FieldBotID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddBotID(v)
+		return nil
+	case bot.FieldSelfID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSelfID(v)
+		return nil
 	case bot.FieldStatus:
 		v, ok := value.(int)
 		if !ok {
@@ -1166,8 +665,14 @@ func (m *BotMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *BotMutation) ResetField(name string) error {
 	switch name {
+	case bot.FieldBotID:
+		m.ResetBotID()
+		return nil
 	case bot.FieldBotName:
 		m.ResetBotName()
+		return nil
+	case bot.FieldSelfID:
+		m.ResetSelfID()
 		return nil
 	case bot.FieldStatus:
 		m.ResetStatus()
@@ -1228,4 +733,1499 @@ func (m *BotMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *BotMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Bot edge %s", name)
+}
+
+// SubMutation represents an operation that mutates the Sub nodes in the graph.
+type SubMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int64
+	sub_type      *int64
+	addsub_type   *int64
+	group_id      *int64
+	addgroup_id   *int64
+	sub_id        *int64
+	addsub_id     *int64
+	bot_id        *int64
+	addbot_id     *int64
+	status        *int
+	addstatus     *int
+	create_time   *time.Time
+	update_time   *time.Time
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Sub, error)
+	predicates    []predicate.Sub
+}
+
+var _ ent.Mutation = (*SubMutation)(nil)
+
+// subOption allows management of the mutation configuration using functional options.
+type subOption func(*SubMutation)
+
+// newSubMutation creates new mutation for the Sub entity.
+func newSubMutation(c config, op Op, opts ...subOption) *SubMutation {
+	m := &SubMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeSub,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withSubID sets the ID field of the mutation.
+func withSubID(id int64) subOption {
+	return func(m *SubMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Sub
+		)
+		m.oldValue = func(ctx context.Context) (*Sub, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Sub.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withSub sets the old Sub of the mutation.
+func withSub(node *Sub) subOption {
+	return func(m *SubMutation) {
+		m.oldValue = func(context.Context) (*Sub, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m SubMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m SubMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Sub entities.
+func (m *SubMutation) SetID(id int64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *SubMutation) ID() (id int64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *SubMutation) IDs(ctx context.Context) ([]int64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Sub.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetSubType sets the "sub_type" field.
+func (m *SubMutation) SetSubType(i int64) {
+	m.sub_type = &i
+	m.addsub_type = nil
+}
+
+// SubType returns the value of the "sub_type" field in the mutation.
+func (m *SubMutation) SubType() (r int64, exists bool) {
+	v := m.sub_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSubType returns the old "sub_type" field's value of the Sub entity.
+// If the Sub object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubMutation) OldSubType(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSubType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSubType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSubType: %w", err)
+	}
+	return oldValue.SubType, nil
+}
+
+// AddSubType adds i to the "sub_type" field.
+func (m *SubMutation) AddSubType(i int64) {
+	if m.addsub_type != nil {
+		*m.addsub_type += i
+	} else {
+		m.addsub_type = &i
+	}
+}
+
+// AddedSubType returns the value that was added to the "sub_type" field in this mutation.
+func (m *SubMutation) AddedSubType() (r int64, exists bool) {
+	v := m.addsub_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSubType resets all changes to the "sub_type" field.
+func (m *SubMutation) ResetSubType() {
+	m.sub_type = nil
+	m.addsub_type = nil
+}
+
+// SetGroupID sets the "group_id" field.
+func (m *SubMutation) SetGroupID(i int64) {
+	m.group_id = &i
+	m.addgroup_id = nil
+}
+
+// GroupID returns the value of the "group_id" field in the mutation.
+func (m *SubMutation) GroupID() (r int64, exists bool) {
+	v := m.group_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGroupID returns the old "group_id" field's value of the Sub entity.
+// If the Sub object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubMutation) OldGroupID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGroupID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGroupID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGroupID: %w", err)
+	}
+	return oldValue.GroupID, nil
+}
+
+// AddGroupID adds i to the "group_id" field.
+func (m *SubMutation) AddGroupID(i int64) {
+	if m.addgroup_id != nil {
+		*m.addgroup_id += i
+	} else {
+		m.addgroup_id = &i
+	}
+}
+
+// AddedGroupID returns the value that was added to the "group_id" field in this mutation.
+func (m *SubMutation) AddedGroupID() (r int64, exists bool) {
+	v := m.addgroup_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetGroupID resets all changes to the "group_id" field.
+func (m *SubMutation) ResetGroupID() {
+	m.group_id = nil
+	m.addgroup_id = nil
+}
+
+// SetSubID sets the "sub_id" field.
+func (m *SubMutation) SetSubID(i int64) {
+	m.sub_id = &i
+	m.addsub_id = nil
+}
+
+// SubID returns the value of the "sub_id" field in the mutation.
+func (m *SubMutation) SubID() (r int64, exists bool) {
+	v := m.sub_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSubID returns the old "sub_id" field's value of the Sub entity.
+// If the Sub object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubMutation) OldSubID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSubID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSubID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSubID: %w", err)
+	}
+	return oldValue.SubID, nil
+}
+
+// AddSubID adds i to the "sub_id" field.
+func (m *SubMutation) AddSubID(i int64) {
+	if m.addsub_id != nil {
+		*m.addsub_id += i
+	} else {
+		m.addsub_id = &i
+	}
+}
+
+// AddedSubID returns the value that was added to the "sub_id" field in this mutation.
+func (m *SubMutation) AddedSubID() (r int64, exists bool) {
+	v := m.addsub_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSubID resets all changes to the "sub_id" field.
+func (m *SubMutation) ResetSubID() {
+	m.sub_id = nil
+	m.addsub_id = nil
+}
+
+// SetBotID sets the "bot_id" field.
+func (m *SubMutation) SetBotID(i int64) {
+	m.bot_id = &i
+	m.addbot_id = nil
+}
+
+// BotID returns the value of the "bot_id" field in the mutation.
+func (m *SubMutation) BotID() (r int64, exists bool) {
+	v := m.bot_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBotID returns the old "bot_id" field's value of the Sub entity.
+// If the Sub object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubMutation) OldBotID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBotID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBotID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBotID: %w", err)
+	}
+	return oldValue.BotID, nil
+}
+
+// AddBotID adds i to the "bot_id" field.
+func (m *SubMutation) AddBotID(i int64) {
+	if m.addbot_id != nil {
+		*m.addbot_id += i
+	} else {
+		m.addbot_id = &i
+	}
+}
+
+// AddedBotID returns the value that was added to the "bot_id" field in this mutation.
+func (m *SubMutation) AddedBotID() (r int64, exists bool) {
+	v := m.addbot_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetBotID resets all changes to the "bot_id" field.
+func (m *SubMutation) ResetBotID() {
+	m.bot_id = nil
+	m.addbot_id = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *SubMutation) SetStatus(i int) {
+	m.status = &i
+	m.addstatus = nil
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *SubMutation) Status() (r int, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Sub entity.
+// If the Sub object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubMutation) OldStatus(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// AddStatus adds i to the "status" field.
+func (m *SubMutation) AddStatus(i int) {
+	if m.addstatus != nil {
+		*m.addstatus += i
+	} else {
+		m.addstatus = &i
+	}
+}
+
+// AddedStatus returns the value that was added to the "status" field in this mutation.
+func (m *SubMutation) AddedStatus() (r int, exists bool) {
+	v := m.addstatus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *SubMutation) ResetStatus() {
+	m.status = nil
+	m.addstatus = nil
+}
+
+// SetCreateTime sets the "create_time" field.
+func (m *SubMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *SubMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the Sub entity.
+// If the Sub object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *SubMutation) ResetCreateTime() {
+	m.create_time = nil
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (m *SubMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
+}
+
+// UpdateTime returns the value of the "update_time" field in the mutation.
+func (m *SubMutation) UpdateTime() (r time.Time, exists bool) {
+	v := m.update_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdateTime returns the old "update_time" field's value of the Sub entity.
+// If the Sub object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubMutation) OldUpdateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdateTime: %w", err)
+	}
+	return oldValue.UpdateTime, nil
+}
+
+// ResetUpdateTime resets all changes to the "update_time" field.
+func (m *SubMutation) ResetUpdateTime() {
+	m.update_time = nil
+}
+
+// Where appends a list predicates to the SubMutation builder.
+func (m *SubMutation) Where(ps ...predicate.Sub) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the SubMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *SubMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Sub, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *SubMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *SubMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Sub).
+func (m *SubMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *SubMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.sub_type != nil {
+		fields = append(fields, sub.FieldSubType)
+	}
+	if m.group_id != nil {
+		fields = append(fields, sub.FieldGroupID)
+	}
+	if m.sub_id != nil {
+		fields = append(fields, sub.FieldSubID)
+	}
+	if m.bot_id != nil {
+		fields = append(fields, sub.FieldBotID)
+	}
+	if m.status != nil {
+		fields = append(fields, sub.FieldStatus)
+	}
+	if m.create_time != nil {
+		fields = append(fields, sub.FieldCreateTime)
+	}
+	if m.update_time != nil {
+		fields = append(fields, sub.FieldUpdateTime)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *SubMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case sub.FieldSubType:
+		return m.SubType()
+	case sub.FieldGroupID:
+		return m.GroupID()
+	case sub.FieldSubID:
+		return m.SubID()
+	case sub.FieldBotID:
+		return m.BotID()
+	case sub.FieldStatus:
+		return m.Status()
+	case sub.FieldCreateTime:
+		return m.CreateTime()
+	case sub.FieldUpdateTime:
+		return m.UpdateTime()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *SubMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case sub.FieldSubType:
+		return m.OldSubType(ctx)
+	case sub.FieldGroupID:
+		return m.OldGroupID(ctx)
+	case sub.FieldSubID:
+		return m.OldSubID(ctx)
+	case sub.FieldBotID:
+		return m.OldBotID(ctx)
+	case sub.FieldStatus:
+		return m.OldStatus(ctx)
+	case sub.FieldCreateTime:
+		return m.OldCreateTime(ctx)
+	case sub.FieldUpdateTime:
+		return m.OldUpdateTime(ctx)
+	}
+	return nil, fmt.Errorf("unknown Sub field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SubMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case sub.FieldSubType:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSubType(v)
+		return nil
+	case sub.FieldGroupID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGroupID(v)
+		return nil
+	case sub.FieldSubID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSubID(v)
+		return nil
+	case sub.FieldBotID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBotID(v)
+		return nil
+	case sub.FieldStatus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case sub.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
+		return nil
+	case sub.FieldUpdateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdateTime(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Sub field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *SubMutation) AddedFields() []string {
+	var fields []string
+	if m.addsub_type != nil {
+		fields = append(fields, sub.FieldSubType)
+	}
+	if m.addgroup_id != nil {
+		fields = append(fields, sub.FieldGroupID)
+	}
+	if m.addsub_id != nil {
+		fields = append(fields, sub.FieldSubID)
+	}
+	if m.addbot_id != nil {
+		fields = append(fields, sub.FieldBotID)
+	}
+	if m.addstatus != nil {
+		fields = append(fields, sub.FieldStatus)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *SubMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case sub.FieldSubType:
+		return m.AddedSubType()
+	case sub.FieldGroupID:
+		return m.AddedGroupID()
+	case sub.FieldSubID:
+		return m.AddedSubID()
+	case sub.FieldBotID:
+		return m.AddedBotID()
+	case sub.FieldStatus:
+		return m.AddedStatus()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SubMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case sub.FieldSubType:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSubType(v)
+		return nil
+	case sub.FieldGroupID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddGroupID(v)
+		return nil
+	case sub.FieldSubID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSubID(v)
+		return nil
+	case sub.FieldBotID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddBotID(v)
+		return nil
+	case sub.FieldStatus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddStatus(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Sub numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *SubMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *SubMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *SubMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Sub nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *SubMutation) ResetField(name string) error {
+	switch name {
+	case sub.FieldSubType:
+		m.ResetSubType()
+		return nil
+	case sub.FieldGroupID:
+		m.ResetGroupID()
+		return nil
+	case sub.FieldSubID:
+		m.ResetSubID()
+		return nil
+	case sub.FieldBotID:
+		m.ResetBotID()
+		return nil
+	case sub.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case sub.FieldCreateTime:
+		m.ResetCreateTime()
+		return nil
+	case sub.FieldUpdateTime:
+		m.ResetUpdateTime()
+		return nil
+	}
+	return fmt.Errorf("unknown Sub field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *SubMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *SubMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *SubMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *SubMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *SubMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *SubMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *SubMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Sub unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *SubMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Sub edge %s", name)
+}
+
+// SubBiliLiveMutation represents an operation that mutates the SubBiliLive nodes in the graph.
+type SubBiliLiveMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *int64
+	room_id         *int64
+	addroom_id      *int64
+	live_state      *int64
+	addlive_state   *int64
+	live_start_time *time.Time
+	live_end_time   *time.Time
+	create_time     *time.Time
+	update_time     *time.Time
+	clearedFields   map[string]struct{}
+	done            bool
+	oldValue        func(context.Context) (*SubBiliLive, error)
+	predicates      []predicate.SubBiliLive
+}
+
+var _ ent.Mutation = (*SubBiliLiveMutation)(nil)
+
+// subbililiveOption allows management of the mutation configuration using functional options.
+type subbililiveOption func(*SubBiliLiveMutation)
+
+// newSubBiliLiveMutation creates new mutation for the SubBiliLive entity.
+func newSubBiliLiveMutation(c config, op Op, opts ...subbililiveOption) *SubBiliLiveMutation {
+	m := &SubBiliLiveMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeSubBiliLive,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withSubBiliLiveID sets the ID field of the mutation.
+func withSubBiliLiveID(id int64) subbililiveOption {
+	return func(m *SubBiliLiveMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *SubBiliLive
+		)
+		m.oldValue = func(ctx context.Context) (*SubBiliLive, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().SubBiliLive.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withSubBiliLive sets the old SubBiliLive of the mutation.
+func withSubBiliLive(node *SubBiliLive) subbililiveOption {
+	return func(m *SubBiliLiveMutation) {
+		m.oldValue = func(context.Context) (*SubBiliLive, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m SubBiliLiveMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m SubBiliLiveMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of SubBiliLive entities.
+func (m *SubBiliLiveMutation) SetID(id int64) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *SubBiliLiveMutation) ID() (id int64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *SubBiliLiveMutation) IDs(ctx context.Context) ([]int64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().SubBiliLive.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetRoomID sets the "room_id" field.
+func (m *SubBiliLiveMutation) SetRoomID(i int64) {
+	m.room_id = &i
+	m.addroom_id = nil
+}
+
+// RoomID returns the value of the "room_id" field in the mutation.
+func (m *SubBiliLiveMutation) RoomID() (r int64, exists bool) {
+	v := m.room_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRoomID returns the old "room_id" field's value of the SubBiliLive entity.
+// If the SubBiliLive object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubBiliLiveMutation) OldRoomID(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRoomID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRoomID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRoomID: %w", err)
+	}
+	return oldValue.RoomID, nil
+}
+
+// AddRoomID adds i to the "room_id" field.
+func (m *SubBiliLiveMutation) AddRoomID(i int64) {
+	if m.addroom_id != nil {
+		*m.addroom_id += i
+	} else {
+		m.addroom_id = &i
+	}
+}
+
+// AddedRoomID returns the value that was added to the "room_id" field in this mutation.
+func (m *SubBiliLiveMutation) AddedRoomID() (r int64, exists bool) {
+	v := m.addroom_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetRoomID resets all changes to the "room_id" field.
+func (m *SubBiliLiveMutation) ResetRoomID() {
+	m.room_id = nil
+	m.addroom_id = nil
+}
+
+// SetLiveState sets the "live_state" field.
+func (m *SubBiliLiveMutation) SetLiveState(i int64) {
+	m.live_state = &i
+	m.addlive_state = nil
+}
+
+// LiveState returns the value of the "live_state" field in the mutation.
+func (m *SubBiliLiveMutation) LiveState() (r int64, exists bool) {
+	v := m.live_state
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLiveState returns the old "live_state" field's value of the SubBiliLive entity.
+// If the SubBiliLive object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubBiliLiveMutation) OldLiveState(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLiveState is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLiveState requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLiveState: %w", err)
+	}
+	return oldValue.LiveState, nil
+}
+
+// AddLiveState adds i to the "live_state" field.
+func (m *SubBiliLiveMutation) AddLiveState(i int64) {
+	if m.addlive_state != nil {
+		*m.addlive_state += i
+	} else {
+		m.addlive_state = &i
+	}
+}
+
+// AddedLiveState returns the value that was added to the "live_state" field in this mutation.
+func (m *SubBiliLiveMutation) AddedLiveState() (r int64, exists bool) {
+	v := m.addlive_state
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLiveState resets all changes to the "live_state" field.
+func (m *SubBiliLiveMutation) ResetLiveState() {
+	m.live_state = nil
+	m.addlive_state = nil
+}
+
+// SetLiveStartTime sets the "live_start_time" field.
+func (m *SubBiliLiveMutation) SetLiveStartTime(t time.Time) {
+	m.live_start_time = &t
+}
+
+// LiveStartTime returns the value of the "live_start_time" field in the mutation.
+func (m *SubBiliLiveMutation) LiveStartTime() (r time.Time, exists bool) {
+	v := m.live_start_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLiveStartTime returns the old "live_start_time" field's value of the SubBiliLive entity.
+// If the SubBiliLive object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubBiliLiveMutation) OldLiveStartTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLiveStartTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLiveStartTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLiveStartTime: %w", err)
+	}
+	return oldValue.LiveStartTime, nil
+}
+
+// ResetLiveStartTime resets all changes to the "live_start_time" field.
+func (m *SubBiliLiveMutation) ResetLiveStartTime() {
+	m.live_start_time = nil
+}
+
+// SetLiveEndTime sets the "live_end_time" field.
+func (m *SubBiliLiveMutation) SetLiveEndTime(t time.Time) {
+	m.live_end_time = &t
+}
+
+// LiveEndTime returns the value of the "live_end_time" field in the mutation.
+func (m *SubBiliLiveMutation) LiveEndTime() (r time.Time, exists bool) {
+	v := m.live_end_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLiveEndTime returns the old "live_end_time" field's value of the SubBiliLive entity.
+// If the SubBiliLive object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubBiliLiveMutation) OldLiveEndTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLiveEndTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLiveEndTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLiveEndTime: %w", err)
+	}
+	return oldValue.LiveEndTime, nil
+}
+
+// ResetLiveEndTime resets all changes to the "live_end_time" field.
+func (m *SubBiliLiveMutation) ResetLiveEndTime() {
+	m.live_end_time = nil
+}
+
+// SetCreateTime sets the "create_time" field.
+func (m *SubBiliLiveMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *SubBiliLiveMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the SubBiliLive entity.
+// If the SubBiliLive object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubBiliLiveMutation) OldCreateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *SubBiliLiveMutation) ResetCreateTime() {
+	m.create_time = nil
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (m *SubBiliLiveMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
+}
+
+// UpdateTime returns the value of the "update_time" field in the mutation.
+func (m *SubBiliLiveMutation) UpdateTime() (r time.Time, exists bool) {
+	v := m.update_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdateTime returns the old "update_time" field's value of the SubBiliLive entity.
+// If the SubBiliLive object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubBiliLiveMutation) OldUpdateTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdateTime: %w", err)
+	}
+	return oldValue.UpdateTime, nil
+}
+
+// ResetUpdateTime resets all changes to the "update_time" field.
+func (m *SubBiliLiveMutation) ResetUpdateTime() {
+	m.update_time = nil
+}
+
+// Where appends a list predicates to the SubBiliLiveMutation builder.
+func (m *SubBiliLiveMutation) Where(ps ...predicate.SubBiliLive) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the SubBiliLiveMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *SubBiliLiveMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.SubBiliLive, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *SubBiliLiveMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *SubBiliLiveMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (SubBiliLive).
+func (m *SubBiliLiveMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *SubBiliLiveMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.room_id != nil {
+		fields = append(fields, subbililive.FieldRoomID)
+	}
+	if m.live_state != nil {
+		fields = append(fields, subbililive.FieldLiveState)
+	}
+	if m.live_start_time != nil {
+		fields = append(fields, subbililive.FieldLiveStartTime)
+	}
+	if m.live_end_time != nil {
+		fields = append(fields, subbililive.FieldLiveEndTime)
+	}
+	if m.create_time != nil {
+		fields = append(fields, subbililive.FieldCreateTime)
+	}
+	if m.update_time != nil {
+		fields = append(fields, subbililive.FieldUpdateTime)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *SubBiliLiveMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case subbililive.FieldRoomID:
+		return m.RoomID()
+	case subbililive.FieldLiveState:
+		return m.LiveState()
+	case subbililive.FieldLiveStartTime:
+		return m.LiveStartTime()
+	case subbililive.FieldLiveEndTime:
+		return m.LiveEndTime()
+	case subbililive.FieldCreateTime:
+		return m.CreateTime()
+	case subbililive.FieldUpdateTime:
+		return m.UpdateTime()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *SubBiliLiveMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case subbililive.FieldRoomID:
+		return m.OldRoomID(ctx)
+	case subbililive.FieldLiveState:
+		return m.OldLiveState(ctx)
+	case subbililive.FieldLiveStartTime:
+		return m.OldLiveStartTime(ctx)
+	case subbililive.FieldLiveEndTime:
+		return m.OldLiveEndTime(ctx)
+	case subbililive.FieldCreateTime:
+		return m.OldCreateTime(ctx)
+	case subbililive.FieldUpdateTime:
+		return m.OldUpdateTime(ctx)
+	}
+	return nil, fmt.Errorf("unknown SubBiliLive field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SubBiliLiveMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case subbililive.FieldRoomID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRoomID(v)
+		return nil
+	case subbililive.FieldLiveState:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLiveState(v)
+		return nil
+	case subbililive.FieldLiveStartTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLiveStartTime(v)
+		return nil
+	case subbililive.FieldLiveEndTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLiveEndTime(v)
+		return nil
+	case subbililive.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
+		return nil
+	case subbililive.FieldUpdateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdateTime(v)
+		return nil
+	}
+	return fmt.Errorf("unknown SubBiliLive field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *SubBiliLiveMutation) AddedFields() []string {
+	var fields []string
+	if m.addroom_id != nil {
+		fields = append(fields, subbililive.FieldRoomID)
+	}
+	if m.addlive_state != nil {
+		fields = append(fields, subbililive.FieldLiveState)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *SubBiliLiveMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case subbililive.FieldRoomID:
+		return m.AddedRoomID()
+	case subbililive.FieldLiveState:
+		return m.AddedLiveState()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SubBiliLiveMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case subbililive.FieldRoomID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRoomID(v)
+		return nil
+	case subbililive.FieldLiveState:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLiveState(v)
+		return nil
+	}
+	return fmt.Errorf("unknown SubBiliLive numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *SubBiliLiveMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *SubBiliLiveMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *SubBiliLiveMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown SubBiliLive nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *SubBiliLiveMutation) ResetField(name string) error {
+	switch name {
+	case subbililive.FieldRoomID:
+		m.ResetRoomID()
+		return nil
+	case subbililive.FieldLiveState:
+		m.ResetLiveState()
+		return nil
+	case subbililive.FieldLiveStartTime:
+		m.ResetLiveStartTime()
+		return nil
+	case subbililive.FieldLiveEndTime:
+		m.ResetLiveEndTime()
+		return nil
+	case subbililive.FieldCreateTime:
+		m.ResetCreateTime()
+		return nil
+	case subbililive.FieldUpdateTime:
+		m.ResetUpdateTime()
+		return nil
+	}
+	return fmt.Errorf("unknown SubBiliLive field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *SubBiliLiveMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *SubBiliLiveMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *SubBiliLiveMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *SubBiliLiveMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *SubBiliLiveMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *SubBiliLiveMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *SubBiliLiveMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown SubBiliLive unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *SubBiliLiveMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown SubBiliLive edge %s", name)
 }
