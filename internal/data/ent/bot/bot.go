@@ -19,6 +19,10 @@ const (
 	FieldSelfID = "self_id"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldLastOnlineTime holds the string denoting the last_online_time field in the database.
+	FieldLastOnlineTime = "last_online_time"
+	// FieldLastOnlineIP holds the string denoting the last_online_ip field in the database.
+	FieldLastOnlineIP = "last_online_ip"
 	// FieldCreateTime holds the string denoting the create_time field in the database.
 	FieldCreateTime = "create_time"
 	// FieldUpdateTime holds the string denoting the update_time field in the database.
@@ -34,6 +38,8 @@ var Columns = []string{
 	FieldBotName,
 	FieldSelfID,
 	FieldStatus,
+	FieldLastOnlineTime,
+	FieldLastOnlineIP,
 	FieldCreateTime,
 	FieldUpdateTime,
 }
@@ -79,6 +85,16 @@ func BySelfID(opts ...sql.OrderTermOption) OrderOption {
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByLastOnlineTime orders the results by the last_online_time field.
+func ByLastOnlineTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastOnlineTime, opts...).ToFunc()
+}
+
+// ByLastOnlineIP orders the results by the last_online_ip field.
+func ByLastOnlineIP(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastOnlineIP, opts...).ToFunc()
 }
 
 // ByCreateTime orders the results by the create_time field.

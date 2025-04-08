@@ -105,6 +105,34 @@ func (bu *BotUpdate) AddStatus(i int) *BotUpdate {
 	return bu
 }
 
+// SetLastOnlineTime sets the "last_online_time" field.
+func (bu *BotUpdate) SetLastOnlineTime(t time.Time) *BotUpdate {
+	bu.mutation.SetLastOnlineTime(t)
+	return bu
+}
+
+// SetNillableLastOnlineTime sets the "last_online_time" field if the given value is not nil.
+func (bu *BotUpdate) SetNillableLastOnlineTime(t *time.Time) *BotUpdate {
+	if t != nil {
+		bu.SetLastOnlineTime(*t)
+	}
+	return bu
+}
+
+// SetLastOnlineIP sets the "last_online_ip" field.
+func (bu *BotUpdate) SetLastOnlineIP(s string) *BotUpdate {
+	bu.mutation.SetLastOnlineIP(s)
+	return bu
+}
+
+// SetNillableLastOnlineIP sets the "last_online_ip" field if the given value is not nil.
+func (bu *BotUpdate) SetNillableLastOnlineIP(s *string) *BotUpdate {
+	if s != nil {
+		bu.SetLastOnlineIP(*s)
+	}
+	return bu
+}
+
 // SetCreateTime sets the "create_time" field.
 func (bu *BotUpdate) SetCreateTime(t time.Time) *BotUpdate {
 	bu.mutation.SetCreateTime(t)
@@ -194,6 +222,12 @@ func (bu *BotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := bu.mutation.AddedStatus(); ok {
 		_spec.AddField(bot.FieldStatus, field.TypeInt, value)
+	}
+	if value, ok := bu.mutation.LastOnlineTime(); ok {
+		_spec.SetField(bot.FieldLastOnlineTime, field.TypeTime, value)
+	}
+	if value, ok := bu.mutation.LastOnlineIP(); ok {
+		_spec.SetField(bot.FieldLastOnlineIP, field.TypeString, value)
 	}
 	if value, ok := bu.mutation.CreateTime(); ok {
 		_spec.SetField(bot.FieldCreateTime, field.TypeTime, value)
@@ -295,6 +329,34 @@ func (buo *BotUpdateOne) SetNillableStatus(i *int) *BotUpdateOne {
 // AddStatus adds i to the "status" field.
 func (buo *BotUpdateOne) AddStatus(i int) *BotUpdateOne {
 	buo.mutation.AddStatus(i)
+	return buo
+}
+
+// SetLastOnlineTime sets the "last_online_time" field.
+func (buo *BotUpdateOne) SetLastOnlineTime(t time.Time) *BotUpdateOne {
+	buo.mutation.SetLastOnlineTime(t)
+	return buo
+}
+
+// SetNillableLastOnlineTime sets the "last_online_time" field if the given value is not nil.
+func (buo *BotUpdateOne) SetNillableLastOnlineTime(t *time.Time) *BotUpdateOne {
+	if t != nil {
+		buo.SetLastOnlineTime(*t)
+	}
+	return buo
+}
+
+// SetLastOnlineIP sets the "last_online_ip" field.
+func (buo *BotUpdateOne) SetLastOnlineIP(s string) *BotUpdateOne {
+	buo.mutation.SetLastOnlineIP(s)
+	return buo
+}
+
+// SetNillableLastOnlineIP sets the "last_online_ip" field if the given value is not nil.
+func (buo *BotUpdateOne) SetNillableLastOnlineIP(s *string) *BotUpdateOne {
+	if s != nil {
+		buo.SetLastOnlineIP(*s)
+	}
 	return buo
 }
 
@@ -417,6 +479,12 @@ func (buo *BotUpdateOne) sqlSave(ctx context.Context) (_node *Bot, err error) {
 	}
 	if value, ok := buo.mutation.AddedStatus(); ok {
 		_spec.AddField(bot.FieldStatus, field.TypeInt, value)
+	}
+	if value, ok := buo.mutation.LastOnlineTime(); ok {
+		_spec.SetField(bot.FieldLastOnlineTime, field.TypeTime, value)
+	}
+	if value, ok := buo.mutation.LastOnlineIP(); ok {
+		_spec.SetField(bot.FieldLastOnlineIP, field.TypeString, value)
 	}
 	if value, ok := buo.mutation.CreateTime(); ok {
 		_spec.SetField(bot.FieldCreateTime, field.TypeTime, value)

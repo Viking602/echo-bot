@@ -16,6 +16,8 @@ var (
 		{Name: "bot_name", Type: field.TypeString},
 		{Name: "self_id", Type: field.TypeInt64},
 		{Name: "status", Type: field.TypeInt, Default: 1},
+		{Name: "last_online_time", Type: field.TypeTime},
+		{Name: "last_online_ip", Type: field.TypeString},
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
 	}

@@ -52,6 +52,18 @@ func (bc *BotCreate) SetNillableStatus(i *int) *BotCreate {
 	return bc
 }
 
+// SetLastOnlineTime sets the "last_online_time" field.
+func (bc *BotCreate) SetLastOnlineTime(t time.Time) *BotCreate {
+	bc.mutation.SetLastOnlineTime(t)
+	return bc
+}
+
+// SetLastOnlineIP sets the "last_online_ip" field.
+func (bc *BotCreate) SetLastOnlineIP(s string) *BotCreate {
+	bc.mutation.SetLastOnlineIP(s)
+	return bc
+}
+
 // SetCreateTime sets the "create_time" field.
 func (bc *BotCreate) SetCreateTime(t time.Time) *BotCreate {
 	bc.mutation.SetCreateTime(t)
@@ -125,6 +137,12 @@ func (bc *BotCreate) check() error {
 	if _, ok := bc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Bot.status"`)}
 	}
+	if _, ok := bc.mutation.LastOnlineTime(); !ok {
+		return &ValidationError{Name: "last_online_time", err: errors.New(`ent: missing required field "Bot.last_online_time"`)}
+	}
+	if _, ok := bc.mutation.LastOnlineIP(); !ok {
+		return &ValidationError{Name: "last_online_ip", err: errors.New(`ent: missing required field "Bot.last_online_ip"`)}
+	}
 	if _, ok := bc.mutation.CreateTime(); !ok {
 		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "Bot.create_time"`)}
 	}
@@ -178,6 +196,14 @@ func (bc *BotCreate) createSpec() (*Bot, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.Status(); ok {
 		_spec.SetField(bot.FieldStatus, field.TypeInt, value)
 		_node.Status = value
+	}
+	if value, ok := bc.mutation.LastOnlineTime(); ok {
+		_spec.SetField(bot.FieldLastOnlineTime, field.TypeTime, value)
+		_node.LastOnlineTime = value
+	}
+	if value, ok := bc.mutation.LastOnlineIP(); ok {
+		_spec.SetField(bot.FieldLastOnlineIP, field.TypeString, value)
+		_node.LastOnlineIP = value
 	}
 	if value, ok := bc.mutation.CreateTime(); ok {
 		_spec.SetField(bot.FieldCreateTime, field.TypeTime, value)

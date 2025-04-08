@@ -74,6 +74,16 @@ func Status(v int) predicate.Bot {
 	return predicate.Bot(sql.FieldEQ(FieldStatus, v))
 }
 
+// LastOnlineTime applies equality check predicate on the "last_online_time" field. It's identical to LastOnlineTimeEQ.
+func LastOnlineTime(v time.Time) predicate.Bot {
+	return predicate.Bot(sql.FieldEQ(FieldLastOnlineTime, v))
+}
+
+// LastOnlineIP applies equality check predicate on the "last_online_ip" field. It's identical to LastOnlineIPEQ.
+func LastOnlineIP(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldEQ(FieldLastOnlineIP, v))
+}
+
 // CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
 func CreateTime(v time.Time) predicate.Bot {
 	return predicate.Bot(sql.FieldEQ(FieldCreateTime, v))
@@ -267,6 +277,111 @@ func StatusLT(v int) predicate.Bot {
 // StatusLTE applies the LTE predicate on the "status" field.
 func StatusLTE(v int) predicate.Bot {
 	return predicate.Bot(sql.FieldLTE(FieldStatus, v))
+}
+
+// LastOnlineTimeEQ applies the EQ predicate on the "last_online_time" field.
+func LastOnlineTimeEQ(v time.Time) predicate.Bot {
+	return predicate.Bot(sql.FieldEQ(FieldLastOnlineTime, v))
+}
+
+// LastOnlineTimeNEQ applies the NEQ predicate on the "last_online_time" field.
+func LastOnlineTimeNEQ(v time.Time) predicate.Bot {
+	return predicate.Bot(sql.FieldNEQ(FieldLastOnlineTime, v))
+}
+
+// LastOnlineTimeIn applies the In predicate on the "last_online_time" field.
+func LastOnlineTimeIn(vs ...time.Time) predicate.Bot {
+	return predicate.Bot(sql.FieldIn(FieldLastOnlineTime, vs...))
+}
+
+// LastOnlineTimeNotIn applies the NotIn predicate on the "last_online_time" field.
+func LastOnlineTimeNotIn(vs ...time.Time) predicate.Bot {
+	return predicate.Bot(sql.FieldNotIn(FieldLastOnlineTime, vs...))
+}
+
+// LastOnlineTimeGT applies the GT predicate on the "last_online_time" field.
+func LastOnlineTimeGT(v time.Time) predicate.Bot {
+	return predicate.Bot(sql.FieldGT(FieldLastOnlineTime, v))
+}
+
+// LastOnlineTimeGTE applies the GTE predicate on the "last_online_time" field.
+func LastOnlineTimeGTE(v time.Time) predicate.Bot {
+	return predicate.Bot(sql.FieldGTE(FieldLastOnlineTime, v))
+}
+
+// LastOnlineTimeLT applies the LT predicate on the "last_online_time" field.
+func LastOnlineTimeLT(v time.Time) predicate.Bot {
+	return predicate.Bot(sql.FieldLT(FieldLastOnlineTime, v))
+}
+
+// LastOnlineTimeLTE applies the LTE predicate on the "last_online_time" field.
+func LastOnlineTimeLTE(v time.Time) predicate.Bot {
+	return predicate.Bot(sql.FieldLTE(FieldLastOnlineTime, v))
+}
+
+// LastOnlineIPEQ applies the EQ predicate on the "last_online_ip" field.
+func LastOnlineIPEQ(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldEQ(FieldLastOnlineIP, v))
+}
+
+// LastOnlineIPNEQ applies the NEQ predicate on the "last_online_ip" field.
+func LastOnlineIPNEQ(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldNEQ(FieldLastOnlineIP, v))
+}
+
+// LastOnlineIPIn applies the In predicate on the "last_online_ip" field.
+func LastOnlineIPIn(vs ...string) predicate.Bot {
+	return predicate.Bot(sql.FieldIn(FieldLastOnlineIP, vs...))
+}
+
+// LastOnlineIPNotIn applies the NotIn predicate on the "last_online_ip" field.
+func LastOnlineIPNotIn(vs ...string) predicate.Bot {
+	return predicate.Bot(sql.FieldNotIn(FieldLastOnlineIP, vs...))
+}
+
+// LastOnlineIPGT applies the GT predicate on the "last_online_ip" field.
+func LastOnlineIPGT(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldGT(FieldLastOnlineIP, v))
+}
+
+// LastOnlineIPGTE applies the GTE predicate on the "last_online_ip" field.
+func LastOnlineIPGTE(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldGTE(FieldLastOnlineIP, v))
+}
+
+// LastOnlineIPLT applies the LT predicate on the "last_online_ip" field.
+func LastOnlineIPLT(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldLT(FieldLastOnlineIP, v))
+}
+
+// LastOnlineIPLTE applies the LTE predicate on the "last_online_ip" field.
+func LastOnlineIPLTE(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldLTE(FieldLastOnlineIP, v))
+}
+
+// LastOnlineIPContains applies the Contains predicate on the "last_online_ip" field.
+func LastOnlineIPContains(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldContains(FieldLastOnlineIP, v))
+}
+
+// LastOnlineIPHasPrefix applies the HasPrefix predicate on the "last_online_ip" field.
+func LastOnlineIPHasPrefix(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldHasPrefix(FieldLastOnlineIP, v))
+}
+
+// LastOnlineIPHasSuffix applies the HasSuffix predicate on the "last_online_ip" field.
+func LastOnlineIPHasSuffix(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldHasSuffix(FieldLastOnlineIP, v))
+}
+
+// LastOnlineIPEqualFold applies the EqualFold predicate on the "last_online_ip" field.
+func LastOnlineIPEqualFold(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldEqualFold(FieldLastOnlineIP, v))
+}
+
+// LastOnlineIPContainsFold applies the ContainsFold predicate on the "last_online_ip" field.
+func LastOnlineIPContainsFold(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldContainsFold(FieldLastOnlineIP, v))
 }
 
 // CreateTimeEQ applies the EQ predicate on the "create_time" field.

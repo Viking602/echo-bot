@@ -22,6 +22,7 @@ func NewBotHandler(registry *registry.CommandRegistry, log *logger.Logger, bot *
 	return &Handler{
 		registry: registry,
 		logger:   log,
+		bot:      bot,
 	}
 }
 
@@ -46,6 +47,10 @@ func (h *Handler) OnMessage(socket *gws.Conn, message *gws.Message) {
 		return
 	}
 
+	if msg.PostType == "meta_event" {
+		h.metaEvent(&msg, socket)
+	}
+
 	if msg.PostType == "message" {
 		reply, ok := h.registry.Execute(&msg)
 		if ok {
@@ -55,8 +60,6 @@ func (h *Handler) OnMessage(socket *gws.Conn, message *gws.Message) {
 }
 
 func (h *Handler) sendReply(msg *model.OneBotMessage, content string) {
-	ctx := context.Background()
-	h.bot.CreateBot(ctx, msg.SelfId)
 	var action model.OneBotAction
 	if msg.MessageType == "private" {
 		action = model.OneBotAction{
@@ -80,4 +83,29 @@ func (h *Handler) sendReply(msg *model.OneBotMessage, content string) {
 
 	actionBytes, _ := json.Marshal(action)
 	h.socket.WriteMessage(gws.OpcodeText, actionBytes)
+}
+
+func (h *Handler) metaEvent(msg *model.OneBotMessage, socket *gws.Conn) {
+	ctx := context.Background()
+
+	if msg.MetaEventType == "lifecycle" && msg.SubType == "connect" {
+		err := h.bot.CreateBot(ctx, msg.SelfId, msg.Time, socket.RemoteAddr().String())
+		if err != nil {
+			h.logger.Error().
+				Str("app", "echo").
+				AnErr("err", err).
+				Msg("Failed to create bot")
+			return
+		}
+	} else if msg.MetaEventType == "heartbeat" {
+		err := h.bot.UpdateBotUptime(ctx, msg.SelfId, msg.Time, socket.RemoteAddr().String())
+		if err != nil {
+			h.logger.Error().
+				Str("app", "echo").
+				AnErr("err", err).
+				Msg("Failed to update bot uptime")
+			return
+		}
+	}
+
 }

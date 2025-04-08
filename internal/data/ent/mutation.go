@@ -34,22 +34,24 @@ const (
 // BotMutation represents an operation that mutates the Bot nodes in the graph.
 type BotMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int64
-	bot_id        *int64
-	addbot_id     *int64
-	bot_name      *string
-	self_id       *int64
-	addself_id    *int64
-	status        *int
-	addstatus     *int
-	create_time   *time.Time
-	update_time   *time.Time
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Bot, error)
-	predicates    []predicate.Bot
+	op               Op
+	typ              string
+	id               *int64
+	bot_id           *int64
+	addbot_id        *int64
+	bot_name         *string
+	self_id          *int64
+	addself_id       *int64
+	status           *int
+	addstatus        *int
+	last_online_time *time.Time
+	last_online_ip   *string
+	create_time      *time.Time
+	update_time      *time.Time
+	clearedFields    map[string]struct{}
+	done             bool
+	oldValue         func(context.Context) (*Bot, error)
+	predicates       []predicate.Bot
 }
 
 var _ ent.Mutation = (*BotMutation)(nil)
@@ -360,6 +362,78 @@ func (m *BotMutation) ResetStatus() {
 	m.addstatus = nil
 }
 
+// SetLastOnlineTime sets the "last_online_time" field.
+func (m *BotMutation) SetLastOnlineTime(t time.Time) {
+	m.last_online_time = &t
+}
+
+// LastOnlineTime returns the value of the "last_online_time" field in the mutation.
+func (m *BotMutation) LastOnlineTime() (r time.Time, exists bool) {
+	v := m.last_online_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastOnlineTime returns the old "last_online_time" field's value of the Bot entity.
+// If the Bot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BotMutation) OldLastOnlineTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastOnlineTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastOnlineTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastOnlineTime: %w", err)
+	}
+	return oldValue.LastOnlineTime, nil
+}
+
+// ResetLastOnlineTime resets all changes to the "last_online_time" field.
+func (m *BotMutation) ResetLastOnlineTime() {
+	m.last_online_time = nil
+}
+
+// SetLastOnlineIP sets the "last_online_ip" field.
+func (m *BotMutation) SetLastOnlineIP(s string) {
+	m.last_online_ip = &s
+}
+
+// LastOnlineIP returns the value of the "last_online_ip" field in the mutation.
+func (m *BotMutation) LastOnlineIP() (r string, exists bool) {
+	v := m.last_online_ip
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastOnlineIP returns the old "last_online_ip" field's value of the Bot entity.
+// If the Bot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BotMutation) OldLastOnlineIP(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastOnlineIP is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastOnlineIP requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastOnlineIP: %w", err)
+	}
+	return oldValue.LastOnlineIP, nil
+}
+
+// ResetLastOnlineIP resets all changes to the "last_online_ip" field.
+func (m *BotMutation) ResetLastOnlineIP() {
+	m.last_online_ip = nil
+}
+
 // SetCreateTime sets the "create_time" field.
 func (m *BotMutation) SetCreateTime(t time.Time) {
 	m.create_time = &t
@@ -466,7 +540,7 @@ func (m *BotMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BotMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 8)
 	if m.bot_id != nil {
 		fields = append(fields, bot.FieldBotID)
 	}
@@ -478,6 +552,12 @@ func (m *BotMutation) Fields() []string {
 	}
 	if m.status != nil {
 		fields = append(fields, bot.FieldStatus)
+	}
+	if m.last_online_time != nil {
+		fields = append(fields, bot.FieldLastOnlineTime)
+	}
+	if m.last_online_ip != nil {
+		fields = append(fields, bot.FieldLastOnlineIP)
 	}
 	if m.create_time != nil {
 		fields = append(fields, bot.FieldCreateTime)
@@ -501,6 +581,10 @@ func (m *BotMutation) Field(name string) (ent.Value, bool) {
 		return m.SelfID()
 	case bot.FieldStatus:
 		return m.Status()
+	case bot.FieldLastOnlineTime:
+		return m.LastOnlineTime()
+	case bot.FieldLastOnlineIP:
+		return m.LastOnlineIP()
 	case bot.FieldCreateTime:
 		return m.CreateTime()
 	case bot.FieldUpdateTime:
@@ -522,6 +606,10 @@ func (m *BotMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldSelfID(ctx)
 	case bot.FieldStatus:
 		return m.OldStatus(ctx)
+	case bot.FieldLastOnlineTime:
+		return m.OldLastOnlineTime(ctx)
+	case bot.FieldLastOnlineIP:
+		return m.OldLastOnlineIP(ctx)
 	case bot.FieldCreateTime:
 		return m.OldCreateTime(ctx)
 	case bot.FieldUpdateTime:
@@ -562,6 +650,20 @@ func (m *BotMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatus(v)
+		return nil
+	case bot.FieldLastOnlineTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastOnlineTime(v)
+		return nil
+	case bot.FieldLastOnlineIP:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastOnlineIP(v)
 		return nil
 	case bot.FieldCreateTime:
 		v, ok := value.(time.Time)
@@ -676,6 +778,12 @@ func (m *BotMutation) ResetField(name string) error {
 		return nil
 	case bot.FieldStatus:
 		m.ResetStatus()
+		return nil
+	case bot.FieldLastOnlineTime:
+		m.ResetLastOnlineTime()
+		return nil
+	case bot.FieldLastOnlineIP:
+		m.ResetLastOnlineIP()
 		return nil
 	case bot.FieldCreateTime:
 		m.ResetCreateTime()

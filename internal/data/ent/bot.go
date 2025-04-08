@@ -25,6 +25,10 @@ type Bot struct {
 	SelfID int64 `json:"self_id,omitempty"`
 	// Status holds the value of the "status" field.
 	Status int `json:"status,omitempty"`
+	// LastOnlineTime holds the value of the "last_online_time" field.
+	LastOnlineTime time.Time `json:"last_online_time,omitempty"`
+	// LastOnlineIP holds the value of the "last_online_ip" field.
+	LastOnlineIP string `json:"last_online_ip,omitempty"`
 	// CreateTime holds the value of the "create_time" field.
 	CreateTime time.Time `json:"create_time,omitempty"`
 	// UpdateTime holds the value of the "update_time" field.
@@ -39,9 +43,9 @@ func (*Bot) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case bot.FieldID, bot.FieldBotID, bot.FieldSelfID, bot.FieldStatus:
 			values[i] = new(sql.NullInt64)
-		case bot.FieldBotName:
+		case bot.FieldBotName, bot.FieldLastOnlineIP:
 			values[i] = new(sql.NullString)
-		case bot.FieldCreateTime, bot.FieldUpdateTime:
+		case bot.FieldLastOnlineTime, bot.FieldCreateTime, bot.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -87,6 +91,18 @@ func (b *Bot) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
 				b.Status = int(value.Int64)
+			}
+		case bot.FieldLastOnlineTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field last_online_time", values[i])
+			} else if value.Valid {
+				b.LastOnlineTime = value.Time
+			}
+		case bot.FieldLastOnlineIP:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field last_online_ip", values[i])
+			} else if value.Valid {
+				b.LastOnlineIP = value.String
 			}
 		case bot.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -147,6 +163,12 @@ func (b *Bot) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", b.Status))
+	builder.WriteString(", ")
+	builder.WriteString("last_online_time=")
+	builder.WriteString(b.LastOnlineTime.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("last_online_ip=")
+	builder.WriteString(b.LastOnlineIP)
 	builder.WriteString(", ")
 	builder.WriteString("create_time=")
 	builder.WriteString(b.CreateTime.Format(time.ANSIC))

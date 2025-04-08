@@ -1,17 +1,18 @@
 package model
 
 type OneBotMessage struct {
-	Time        int64     `json:"time"`
-	SelfId      int64     `json:"self_id"`
-	PostType    string    `json:"post_type"`
-	MessageType string    `json:"message_type"`
-	SubType     string    `json:"sub_type"`
-	UserId      int64     `json:"user_id"`
-	MessageId   int64     `json:"message_id"`
-	Message     []Message `json:"message"`
-	RawMessage  string    `json:"raw_message"`
-	Font        int64     `json:"font"`
-	Sender      Sender    `json:"sender"`
+	Time          int64     `json:"time"`
+	SelfId        int64     `json:"self_id"`
+	PostType      string    `json:"post_type"`
+	MetaEventType string    `json:"meta_event_type"`
+	MessageType   string    `json:"message_type"`
+	SubType       string    `json:"sub_type"`
+	UserId        int64     `json:"user_id"`
+	MessageId     int64     `json:"message_id"`
+	Message       []Message `json:"message"`
+	RawMessage    string    `json:"raw_message"`
+	Font          int64     `json:"font"`
+	Sender        Sender    `json:"sender"`
 }
 
 type Message struct {
