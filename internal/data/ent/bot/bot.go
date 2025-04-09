@@ -17,6 +17,8 @@ const (
 	FieldBotName = "bot_name"
 	// FieldSelfID holds the string denoting the self_id field in the database.
 	FieldSelfID = "self_id"
+	// FieldAccessToken holds the string denoting the access_token field in the database.
+	FieldAccessToken = "access_token"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldLastOnlineTime holds the string denoting the last_online_time field in the database.
@@ -37,6 +39,7 @@ var Columns = []string{
 	FieldBotID,
 	FieldBotName,
 	FieldSelfID,
+	FieldAccessToken,
 	FieldStatus,
 	FieldLastOnlineTime,
 	FieldLastOnlineIP,
@@ -80,6 +83,11 @@ func ByBotName(opts ...sql.OrderTermOption) OrderOption {
 // BySelfID orders the results by the self_id field.
 func BySelfID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSelfID, opts...).ToFunc()
+}
+
+// ByAccessToken orders the results by the access_token field.
+func ByAccessToken(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAccessToken, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

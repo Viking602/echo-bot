@@ -69,6 +69,11 @@ func SelfID(v int64) predicate.Bot {
 	return predicate.Bot(sql.FieldEQ(FieldSelfID, v))
 }
 
+// AccessToken applies equality check predicate on the "access_token" field. It's identical to AccessTokenEQ.
+func AccessToken(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldEQ(FieldAccessToken, v))
+}
+
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
 func Status(v int) predicate.Bot {
 	return predicate.Bot(sql.FieldEQ(FieldStatus, v))
@@ -237,6 +242,71 @@ func SelfIDLT(v int64) predicate.Bot {
 // SelfIDLTE applies the LTE predicate on the "self_id" field.
 func SelfIDLTE(v int64) predicate.Bot {
 	return predicate.Bot(sql.FieldLTE(FieldSelfID, v))
+}
+
+// AccessTokenEQ applies the EQ predicate on the "access_token" field.
+func AccessTokenEQ(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldEQ(FieldAccessToken, v))
+}
+
+// AccessTokenNEQ applies the NEQ predicate on the "access_token" field.
+func AccessTokenNEQ(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldNEQ(FieldAccessToken, v))
+}
+
+// AccessTokenIn applies the In predicate on the "access_token" field.
+func AccessTokenIn(vs ...string) predicate.Bot {
+	return predicate.Bot(sql.FieldIn(FieldAccessToken, vs...))
+}
+
+// AccessTokenNotIn applies the NotIn predicate on the "access_token" field.
+func AccessTokenNotIn(vs ...string) predicate.Bot {
+	return predicate.Bot(sql.FieldNotIn(FieldAccessToken, vs...))
+}
+
+// AccessTokenGT applies the GT predicate on the "access_token" field.
+func AccessTokenGT(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldGT(FieldAccessToken, v))
+}
+
+// AccessTokenGTE applies the GTE predicate on the "access_token" field.
+func AccessTokenGTE(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldGTE(FieldAccessToken, v))
+}
+
+// AccessTokenLT applies the LT predicate on the "access_token" field.
+func AccessTokenLT(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldLT(FieldAccessToken, v))
+}
+
+// AccessTokenLTE applies the LTE predicate on the "access_token" field.
+func AccessTokenLTE(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldLTE(FieldAccessToken, v))
+}
+
+// AccessTokenContains applies the Contains predicate on the "access_token" field.
+func AccessTokenContains(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldContains(FieldAccessToken, v))
+}
+
+// AccessTokenHasPrefix applies the HasPrefix predicate on the "access_token" field.
+func AccessTokenHasPrefix(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldHasPrefix(FieldAccessToken, v))
+}
+
+// AccessTokenHasSuffix applies the HasSuffix predicate on the "access_token" field.
+func AccessTokenHasSuffix(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldHasSuffix(FieldAccessToken, v))
+}
+
+// AccessTokenEqualFold applies the EqualFold predicate on the "access_token" field.
+func AccessTokenEqualFold(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldEqualFold(FieldAccessToken, v))
+}
+
+// AccessTokenContainsFold applies the ContainsFold predicate on the "access_token" field.
+func AccessTokenContainsFold(v string) predicate.Bot {
+	return predicate.Bot(sql.FieldContainsFold(FieldAccessToken, v))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.

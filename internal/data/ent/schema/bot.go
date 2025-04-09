@@ -17,6 +17,7 @@ func (Bot) Fields() []ent.Field {
 		field.Int64("bot_id"),
 		field.String("bot_name"),
 		field.Int64("self_id"),
+		field.String("access_token"),
 		field.Int("status").Default(1),
 		field.Time("last_online_time"),
 		field.String("last_online_ip"),

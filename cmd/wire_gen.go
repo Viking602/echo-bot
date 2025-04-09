@@ -18,14 +18,14 @@ import (
 // Injectors from wire.go:
 
 func wireApp(log *logger.Logger) (*app.Bot, error) {
-	echoService := service.NewEchoService()
-	commandRegistry := command.NewInitializedRegistry(echoService)
 	dataData, err := data.NewData()
 	if err != nil {
 		return nil, err
 	}
 	botRepo := data.NewBotRepo(dataData)
 	botUsecase := biz.NewBotUsecase(botRepo)
+	setMasterService := service.NewSetMasterService(botUsecase)
+	commandRegistry := command.NewInitializedRegistry(setMasterService)
 	handler := app.NewBotHandler(commandRegistry, log, botUsecase)
 	bot := app.NewBot(handler)
 	return bot, nil

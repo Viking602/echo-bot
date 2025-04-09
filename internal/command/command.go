@@ -8,14 +8,14 @@ import (
 )
 
 var ProviderSet = wire.NewSet(
-	NewEchoCommand,
+	NewSetCommand,
 	NewInitializedRegistry,
 )
 
-func NewInitializedRegistry(echoService *service.EchoService) *registry.CommandRegistry {
+func NewInitializedRegistry(setService *service.SetMasterService) *registry.CommandRegistry {
 	reg := registry.NewCommandRegistry()
 	registrars := []model.CommandRegistrar{
-		NewEchoCommand(echoService),
+		NewSetCommand(setService),
 	}
 
 	for _, registrar := range registrars {

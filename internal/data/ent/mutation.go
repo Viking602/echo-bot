@@ -42,6 +42,7 @@ type BotMutation struct {
 	bot_name         *string
 	self_id          *int64
 	addself_id       *int64
+	access_token     *string
 	status           *int
 	addstatus        *int
 	last_online_time *time.Time
@@ -306,6 +307,42 @@ func (m *BotMutation) ResetSelfID() {
 	m.addself_id = nil
 }
 
+// SetAccessToken sets the "access_token" field.
+func (m *BotMutation) SetAccessToken(s string) {
+	m.access_token = &s
+}
+
+// AccessToken returns the value of the "access_token" field in the mutation.
+func (m *BotMutation) AccessToken() (r string, exists bool) {
+	v := m.access_token
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccessToken returns the old "access_token" field's value of the Bot entity.
+// If the Bot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BotMutation) OldAccessToken(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccessToken is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccessToken requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccessToken: %w", err)
+	}
+	return oldValue.AccessToken, nil
+}
+
+// ResetAccessToken resets all changes to the "access_token" field.
+func (m *BotMutation) ResetAccessToken() {
+	m.access_token = nil
+}
+
 // SetStatus sets the "status" field.
 func (m *BotMutation) SetStatus(i int) {
 	m.status = &i
@@ -540,7 +577,7 @@ func (m *BotMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BotMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.bot_id != nil {
 		fields = append(fields, bot.FieldBotID)
 	}
@@ -549,6 +586,9 @@ func (m *BotMutation) Fields() []string {
 	}
 	if m.self_id != nil {
 		fields = append(fields, bot.FieldSelfID)
+	}
+	if m.access_token != nil {
+		fields = append(fields, bot.FieldAccessToken)
 	}
 	if m.status != nil {
 		fields = append(fields, bot.FieldStatus)
@@ -579,6 +619,8 @@ func (m *BotMutation) Field(name string) (ent.Value, bool) {
 		return m.BotName()
 	case bot.FieldSelfID:
 		return m.SelfID()
+	case bot.FieldAccessToken:
+		return m.AccessToken()
 	case bot.FieldStatus:
 		return m.Status()
 	case bot.FieldLastOnlineTime:
@@ -604,6 +646,8 @@ func (m *BotMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldBotName(ctx)
 	case bot.FieldSelfID:
 		return m.OldSelfID(ctx)
+	case bot.FieldAccessToken:
+		return m.OldAccessToken(ctx)
 	case bot.FieldStatus:
 		return m.OldStatus(ctx)
 	case bot.FieldLastOnlineTime:
@@ -643,6 +687,13 @@ func (m *BotMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSelfID(v)
+		return nil
+	case bot.FieldAccessToken:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccessToken(v)
 		return nil
 	case bot.FieldStatus:
 		v, ok := value.(int)
@@ -775,6 +826,9 @@ func (m *BotMutation) ResetField(name string) error {
 		return nil
 	case bot.FieldSelfID:
 		m.ResetSelfID()
+		return nil
+	case bot.FieldAccessToken:
+		m.ResetAccessToken()
 		return nil
 	case bot.FieldStatus:
 		m.ResetStatus()

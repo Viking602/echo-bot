@@ -66,16 +66,7 @@ func (h *Handler) OnClose(socket *gws.Conn, err error) {
 }
 
 func (h *Handler) OnMessage(socket *gws.Conn, message *gws.Message) {
-	defer func(message *gws.Message) {
-		err := message.Close()
-		if err != nil {
-			h.logger.Error().
-				Str("app", "echo").
-				AnErr("err", err).
-				Str("message", string(message.Bytes())).
-				Msg("消息关闭失败")
-		}
-	}(message)
+	defer message.Close()
 
 	var data map[string]interface{}
 	if err := json.Unmarshal(message.Bytes(), &data); err != nil {
@@ -105,7 +96,7 @@ func (h *Handler) OnMessage(socket *gws.Conn, message *gws.Message) {
 			return
 		}
 
-		if msg.PostType == "meta_event" && msg.SubType == "heartbeat" {
+		if msg.PostType == "meta_event" {
 			h.metaEvent(&msg, socket)
 		}
 
@@ -198,10 +189,14 @@ func (h *Handler) sendReply(socket *gws.Conn, msg *model.OneBotMessage, content 
 
 func (h *Handler) metaEvent(msg *model.OneBotMessage, socket *gws.Conn) {
 	ctx := context.Background()
-
 	if msg.MetaEventType == "lifecycle" && msg.SubType == "connect" {
 		h.logger.Info().Int64("bot", msg.SelfId).Msg("BOT连接成功")
-		err := h.bot.CreateBot(ctx, msg.SelfId, msg.Time, socket.RemoteAddr().String())
+		val, exits := socket.Session().Load("token")
+		if !exits {
+			h.logger.Error().Str("app", "echo").Msg("获取 BOT 令牌失败")
+			return
+		}
+		err := h.bot.CreateBot(ctx, msg.SelfId, msg.Time, socket.RemoteAddr().String(), val.(string))
 		if err != nil {
 			h.logger.Error().
 				Str("app", "echo").
@@ -218,7 +213,6 @@ func (h *Handler) metaEvent(msg *model.OneBotMessage, socket *gws.Conn) {
 				Msg("更新 BOT 在线时间失败")
 			return
 		}
-		h.logger.Info().Int64("bot", msg.SelfId).Msg("收到心跳包")
 	}
 }
 

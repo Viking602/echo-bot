@@ -84,6 +84,20 @@ func (bu *BotUpdate) AddSelfID(i int64) *BotUpdate {
 	return bu
 }
 
+// SetAccessToken sets the "access_token" field.
+func (bu *BotUpdate) SetAccessToken(s string) *BotUpdate {
+	bu.mutation.SetAccessToken(s)
+	return bu
+}
+
+// SetNillableAccessToken sets the "access_token" field if the given value is not nil.
+func (bu *BotUpdate) SetNillableAccessToken(s *string) *BotUpdate {
+	if s != nil {
+		bu.SetAccessToken(*s)
+	}
+	return bu
+}
+
 // SetStatus sets the "status" field.
 func (bu *BotUpdate) SetStatus(i int) *BotUpdate {
 	bu.mutation.ResetStatus()
@@ -217,6 +231,9 @@ func (bu *BotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := bu.mutation.AddedSelfID(); ok {
 		_spec.AddField(bot.FieldSelfID, field.TypeInt64, value)
 	}
+	if value, ok := bu.mutation.AccessToken(); ok {
+		_spec.SetField(bot.FieldAccessToken, field.TypeString, value)
+	}
 	if value, ok := bu.mutation.Status(); ok {
 		_spec.SetField(bot.FieldStatus, field.TypeInt, value)
 	}
@@ -308,6 +325,20 @@ func (buo *BotUpdateOne) SetNillableSelfID(i *int64) *BotUpdateOne {
 // AddSelfID adds i to the "self_id" field.
 func (buo *BotUpdateOne) AddSelfID(i int64) *BotUpdateOne {
 	buo.mutation.AddSelfID(i)
+	return buo
+}
+
+// SetAccessToken sets the "access_token" field.
+func (buo *BotUpdateOne) SetAccessToken(s string) *BotUpdateOne {
+	buo.mutation.SetAccessToken(s)
+	return buo
+}
+
+// SetNillableAccessToken sets the "access_token" field if the given value is not nil.
+func (buo *BotUpdateOne) SetNillableAccessToken(s *string) *BotUpdateOne {
+	if s != nil {
+		buo.SetAccessToken(*s)
+	}
 	return buo
 }
 
@@ -473,6 +504,9 @@ func (buo *BotUpdateOne) sqlSave(ctx context.Context) (_node *Bot, err error) {
 	}
 	if value, ok := buo.mutation.AddedSelfID(); ok {
 		_spec.AddField(bot.FieldSelfID, field.TypeInt64, value)
+	}
+	if value, ok := buo.mutation.AccessToken(); ok {
+		_spec.SetField(bot.FieldAccessToken, field.TypeString, value)
 	}
 	if value, ok := buo.mutation.Status(); ok {
 		_spec.SetField(bot.FieldStatus, field.TypeInt, value)

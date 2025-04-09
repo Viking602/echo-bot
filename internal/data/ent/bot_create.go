@@ -38,6 +38,12 @@ func (bc *BotCreate) SetSelfID(i int64) *BotCreate {
 	return bc
 }
 
+// SetAccessToken sets the "access_token" field.
+func (bc *BotCreate) SetAccessToken(s string) *BotCreate {
+	bc.mutation.SetAccessToken(s)
+	return bc
+}
+
 // SetStatus sets the "status" field.
 func (bc *BotCreate) SetStatus(i int) *BotCreate {
 	bc.mutation.SetStatus(i)
@@ -134,6 +140,9 @@ func (bc *BotCreate) check() error {
 	if _, ok := bc.mutation.SelfID(); !ok {
 		return &ValidationError{Name: "self_id", err: errors.New(`ent: missing required field "Bot.self_id"`)}
 	}
+	if _, ok := bc.mutation.AccessToken(); !ok {
+		return &ValidationError{Name: "access_token", err: errors.New(`ent: missing required field "Bot.access_token"`)}
+	}
 	if _, ok := bc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Bot.status"`)}
 	}
@@ -192,6 +201,10 @@ func (bc *BotCreate) createSpec() (*Bot, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.SelfID(); ok {
 		_spec.SetField(bot.FieldSelfID, field.TypeInt64, value)
 		_node.SelfID = value
+	}
+	if value, ok := bc.mutation.AccessToken(); ok {
+		_spec.SetField(bot.FieldAccessToken, field.TypeString, value)
+		_node.AccessToken = value
 	}
 	if value, ok := bc.mutation.Status(); ok {
 		_spec.SetField(bot.FieldStatus, field.TypeInt, value)

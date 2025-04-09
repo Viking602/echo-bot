@@ -21,6 +21,7 @@ func (r *botRepo) Create(ctx context.Context, bot *biz.Bot) error {
 		SetBotName(bot.BotName).
 		SetBotID(bot.BotId).
 		SetSelfID(bot.SelfId).
+		SetAccessToken(bot.AccessToken).
 		SetStatus(1).
 		SetLastOnlineTime(bot.LastOnlineTime).
 		SetLastOnlineIP(bot.LastOnlineIP).
@@ -43,13 +44,14 @@ func (r *botRepo) GetBot(ctx context.Context, botId int64) (*biz.Bot, error) {
 		return nil, err
 	}
 	return &biz.Bot{
-		Id:         bot.ID,
-		BotId:      bot.BotID,
-		BotName:    bot.BotName,
-		SelfId:     bot.SelfID,
-		Status:     bot.Status,
-		CreateTime: bot.CreateTime.Format("2006-01-02 15:04:05"),
-		UpdateTime: bot.UpdateTime.Format("2006-01-02 15:04:05"),
+		Id:          bot.ID,
+		BotId:       bot.BotID,
+		BotName:     bot.BotName,
+		SelfId:      bot.SelfID,
+		Status:      bot.Status,
+		AccessToken: bot.AccessToken,
+		CreateTime:  bot.CreateTime.Format("2006-01-02 15:04:05"),
+		UpdateTime:  bot.UpdateTime.Format("2006-01-02 15:04:05"),
 	}, nil
 }
 
@@ -64,4 +66,14 @@ func (r *botRepo) UpdateUptime(ctx context.Context, bot *biz.Bot) error {
 	}
 	return nil
 
+}
+
+func (r *botRepo) UpdateSelfId(ctx context.Context, bot *biz.Bot) error {
+	_, err := r.data.db.Bot.Update().SetSelfID(bot.SelfId).
+		Where(bot2.BotID(bot.BotId)).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }

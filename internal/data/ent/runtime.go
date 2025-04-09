@@ -15,7 +15,7 @@ func init() {
 	botFields := schema.Bot{}.Fields()
 	_ = botFields
 	// botDescStatus is the schema descriptor for status field.
-	botDescStatus := botFields[4].Descriptor()
+	botDescStatus := botFields[5].Descriptor()
 	// bot.DefaultStatus holds the default value on creation for the status field.
 	bot.DefaultStatus = botDescStatus.Default.(int)
 	subFields := schema.Sub{}.Fields()

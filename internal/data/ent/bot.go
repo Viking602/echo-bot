@@ -23,6 +23,8 @@ type Bot struct {
 	BotName string `json:"bot_name,omitempty"`
 	// SelfID holds the value of the "self_id" field.
 	SelfID int64 `json:"self_id,omitempty"`
+	// AccessToken holds the value of the "access_token" field.
+	AccessToken string `json:"access_token,omitempty"`
 	// Status holds the value of the "status" field.
 	Status int `json:"status,omitempty"`
 	// LastOnlineTime holds the value of the "last_online_time" field.
@@ -43,7 +45,7 @@ func (*Bot) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case bot.FieldID, bot.FieldBotID, bot.FieldSelfID, bot.FieldStatus:
 			values[i] = new(sql.NullInt64)
-		case bot.FieldBotName, bot.FieldLastOnlineIP:
+		case bot.FieldBotName, bot.FieldAccessToken, bot.FieldLastOnlineIP:
 			values[i] = new(sql.NullString)
 		case bot.FieldLastOnlineTime, bot.FieldCreateTime, bot.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
@@ -85,6 +87,12 @@ func (b *Bot) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field self_id", values[i])
 			} else if value.Valid {
 				b.SelfID = value.Int64
+			}
+		case bot.FieldAccessToken:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field access_token", values[i])
+			} else if value.Valid {
+				b.AccessToken = value.String
 			}
 		case bot.FieldStatus:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -160,6 +168,9 @@ func (b *Bot) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("self_id=")
 	builder.WriteString(fmt.Sprintf("%v", b.SelfID))
+	builder.WriteString(", ")
+	builder.WriteString("access_token=")
+	builder.WriteString(b.AccessToken)
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", b.Status))
