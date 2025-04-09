@@ -1,4 +1,4 @@
-package bot
+package app
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 	"echo/internal/registry"
 	"echo/pkg/logger"
 	"encoding/json"
-	"fmt"
 	"github.com/lxzan/gws"
 	"sync"
 	"time"
@@ -59,7 +58,7 @@ func (h *Handler) OnOpen(socket *gws.Conn) {
 	h.mu.Unlock()
 }
 
-func (h *Handler) OnClose(socket *gws.Conn) {
+func (h *Handler) OnClose(socket *gws.Conn, err error) {
 	h.logger.Info().Str("address", socket.RemoteAddr().String()).Msg("连接关闭")
 	h.mu.Lock()
 	delete(h.conns, socket)
@@ -67,7 +66,16 @@ func (h *Handler) OnClose(socket *gws.Conn) {
 }
 
 func (h *Handler) OnMessage(socket *gws.Conn, message *gws.Message) {
-	defer message.Close()
+	defer func(message *gws.Message) {
+		err := message.Close()
+		if err != nil {
+			h.logger.Error().
+				Str("app", "echo").
+				AnErr("err", err).
+				Str("message", string(message.Bytes())).
+				Msg("消息关闭失败")
+		}
+	}(message)
 
 	var data map[string]interface{}
 	if err := json.Unmarshal(message.Bytes(), &data); err != nil {
@@ -86,7 +94,7 @@ func (h *Handler) OnMessage(socket *gws.Conn, message *gws.Message) {
 	}
 
 	// 处理事件消息（有 post_type）
-	if postType, ok := data["post_type"]; ok {
+	if _, ok := data["post_type"]; ok {
 		var msg model.OneBotMessage
 		if err := json.Unmarshal(message.Bytes(), &msg); err != nil {
 			h.logger.Error().
@@ -97,19 +105,15 @@ func (h *Handler) OnMessage(socket *gws.Conn, message *gws.Message) {
 			return
 		}
 
-		switch postType {
-		case "meta_event":
+		if msg.PostType == "meta_event" && msg.SubType == "heartbeat" {
 			h.metaEvent(&msg, socket)
-		case "message":
-			h.logger.Info().Str("message", string(message.Bytes())).Msg("收到指令消息")
+		}
+
+		if msg.PostType == "message" {
 			reply, ok := h.registry.Execute(&msg)
 			if ok {
 				h.sendReply(socket, &msg, reply)
-			} else {
-				h.logger.Info().Str("message", msg.RawMessage).Msg("指令无响应")
 			}
-		default:
-			h.logger.Info().Str("post_type", postType.(string)).Msg("未处理的事件类型")
 		}
 	}
 }
@@ -129,7 +133,13 @@ func (h *Handler) SendAPIRequest(socket *gws.Conn, request []byte, msg *model.On
 		sentAt  time.Time
 	}{handler, msg, time.Now()})
 
-	socket.WriteMessage(gws.OpcodeText, request)
+	if err := socket.WriteMessage(gws.OpcodeText, request); err != nil {
+		h.logger.Error().
+			Str("app", "echo").
+			AnErr("err", err).
+			Str("request", string(request)).
+			Msg("消息发送失败")
+	}
 	h.logger.Info().Str("request", string(request)).Msg("API 请求已发送")
 }
 
@@ -173,7 +183,13 @@ func (h *Handler) sendReply(socket *gws.Conn, msg *model.OneBotMessage, content 
 	h.mu.Unlock()
 
 	if _, ok := h.conns[socket]; ok {
-		socket.WriteMessage(gws.OpcodeText, actionBytes)
+		if err := socket.WriteMessage(gws.OpcodeText, actionBytes); err != nil {
+			h.logger.Error().
+				Str("app", "echo").
+				AnErr("err", err).
+				Str("content", content).
+				Msg("消息发送失败")
+		}
 		h.logger.Info().Str("content", content).Msg("消息已发送")
 	} else {
 		h.logger.Error().Str("app", "echo").Msg("消息发送失败，无可用链接")
@@ -252,8 +268,6 @@ func (h *Handler) handleSendResponse(socket *gws.Conn, msg *model.OneBotMessage,
 				Int64("groupId", msg.GroupId).
 				Int64("botId", msg.SelfId).
 				Msg("消息发送成功")
-			reply := fmt.Sprintf("消息发送成功，Message ID: %d", messageID)
-			h.sendReply(socket, msg, reply)
 		}
 	} else {
 		h.logger.Error().

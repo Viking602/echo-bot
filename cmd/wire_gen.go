@@ -7,18 +7,17 @@
 package main
 
 import (
+	"echo/internal/app"
 	"echo/internal/biz"
 	"echo/internal/command"
 	"echo/internal/data"
 	"echo/internal/service"
-	"echo/pkg/app"
-	"echo/pkg/bot"
 	"echo/pkg/logger"
 )
 
 // Injectors from wire.go:
 
-func wireApp(log *logger.Logger) (*app.App, error) {
+func wireApp(log *logger.Logger) (*app.Bot, error) {
 	echoService := service.NewEchoService()
 	commandRegistry := command.NewInitializedRegistry(echoService)
 	dataData, err := data.NewData()
@@ -27,8 +26,7 @@ func wireApp(log *logger.Logger) (*app.App, error) {
 	}
 	botRepo := data.NewBotRepo(dataData)
 	botUsecase := biz.NewBotUsecase(botRepo)
-	handler := bot.NewBotHandler(commandRegistry, log, botUsecase)
-	botBot := bot.NewBot(handler)
-	appApp := app.NewApp(botBot, log)
-	return appApp, nil
+	handler := app.NewBotHandler(commandRegistry, log, botUsecase)
+	bot := app.NewBot(handler)
+	return bot, nil
 }

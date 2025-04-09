@@ -2,6 +2,7 @@ package registry
 
 import (
 	"echo/internal/model"
+	"fmt"
 	"strings"
 )
 
@@ -67,7 +68,7 @@ func (r *CommandRegistry) Execute(msg *model.OneBotMessage) (string, bool) {
 	if cmd.Handler != nil {
 		return cmd.Handler(msg, remainingParts), true
 	}
-	return "缺少参数", true
+	return fmt.Sprintf("%s 指令缺少参数", cmd.Name), true
 }
 
 // isScopeValid 检查命令是否适用于当前消息类型

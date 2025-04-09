@@ -1,4 +1,4 @@
-package bot
+package app
 
 import (
 	"github.com/lxzan/gws"
@@ -9,19 +9,22 @@ type Bot struct {
 }
 
 func NewBot(handler *Handler) *Bot {
-	// 在 Bot 初始化时注册指令
 	return &Bot{
 		handler: handler,
 	}
 }
 
-func (b *Bot) Run() {
+func (b *Bot) Run() error {
 	server := gws.NewServer(b.handler, &gws.ServerOption{
+		ParallelEnabled: true,
 		PermessageDeflate: gws.PermessageDeflate{
 			Enabled:               true,
 			ServerContextTakeover: true,
 			ClientContextTakeover: true,
 		},
 	})
-	server.Run(":6666")
+	if err := server.Run(":6666"); err != nil {
+		return err
+	}
+	return nil
 }
