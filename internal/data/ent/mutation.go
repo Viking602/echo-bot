@@ -502,9 +502,22 @@ func (m *BotMutation) OldCreateTime(ctx context.Context) (v time.Time, err error
 	return oldValue.CreateTime, nil
 }
 
+// ClearCreateTime clears the value of the "create_time" field.
+func (m *BotMutation) ClearCreateTime() {
+	m.create_time = nil
+	m.clearedFields[bot.FieldCreateTime] = struct{}{}
+}
+
+// CreateTimeCleared returns if the "create_time" field was cleared in this mutation.
+func (m *BotMutation) CreateTimeCleared() bool {
+	_, ok := m.clearedFields[bot.FieldCreateTime]
+	return ok
+}
+
 // ResetCreateTime resets all changes to the "create_time" field.
 func (m *BotMutation) ResetCreateTime() {
 	m.create_time = nil
+	delete(m.clearedFields, bot.FieldCreateTime)
 }
 
 // SetUpdateTime sets the "update_time" field.
@@ -538,9 +551,22 @@ func (m *BotMutation) OldUpdateTime(ctx context.Context) (v time.Time, err error
 	return oldValue.UpdateTime, nil
 }
 
+// ClearUpdateTime clears the value of the "update_time" field.
+func (m *BotMutation) ClearUpdateTime() {
+	m.update_time = nil
+	m.clearedFields[bot.FieldUpdateTime] = struct{}{}
+}
+
+// UpdateTimeCleared returns if the "update_time" field was cleared in this mutation.
+func (m *BotMutation) UpdateTimeCleared() bool {
+	_, ok := m.clearedFields[bot.FieldUpdateTime]
+	return ok
+}
+
 // ResetUpdateTime resets all changes to the "update_time" field.
 func (m *BotMutation) ResetUpdateTime() {
 	m.update_time = nil
+	delete(m.clearedFields, bot.FieldUpdateTime)
 }
 
 // Where appends a list predicates to the BotMutation builder.
@@ -798,7 +824,14 @@ func (m *BotMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *BotMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(bot.FieldCreateTime) {
+		fields = append(fields, bot.FieldCreateTime)
+	}
+	if m.FieldCleared(bot.FieldUpdateTime) {
+		fields = append(fields, bot.FieldUpdateTime)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -811,6 +844,14 @@ func (m *BotMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *BotMutation) ClearField(name string) error {
+	switch name {
+	case bot.FieldCreateTime:
+		m.ClearCreateTime()
+		return nil
+	case bot.FieldUpdateTime:
+		m.ClearUpdateTime()
+		return nil
+	}
 	return fmt.Errorf("unknown Bot nullable field %s", name)
 }
 
@@ -1336,9 +1377,22 @@ func (m *SubMutation) OldCreateTime(ctx context.Context) (v time.Time, err error
 	return oldValue.CreateTime, nil
 }
 
+// ClearCreateTime clears the value of the "create_time" field.
+func (m *SubMutation) ClearCreateTime() {
+	m.create_time = nil
+	m.clearedFields[sub.FieldCreateTime] = struct{}{}
+}
+
+// CreateTimeCleared returns if the "create_time" field was cleared in this mutation.
+func (m *SubMutation) CreateTimeCleared() bool {
+	_, ok := m.clearedFields[sub.FieldCreateTime]
+	return ok
+}
+
 // ResetCreateTime resets all changes to the "create_time" field.
 func (m *SubMutation) ResetCreateTime() {
 	m.create_time = nil
+	delete(m.clearedFields, sub.FieldCreateTime)
 }
 
 // SetUpdateTime sets the "update_time" field.
@@ -1372,9 +1426,22 @@ func (m *SubMutation) OldUpdateTime(ctx context.Context) (v time.Time, err error
 	return oldValue.UpdateTime, nil
 }
 
+// ClearUpdateTime clears the value of the "update_time" field.
+func (m *SubMutation) ClearUpdateTime() {
+	m.update_time = nil
+	m.clearedFields[sub.FieldUpdateTime] = struct{}{}
+}
+
+// UpdateTimeCleared returns if the "update_time" field was cleared in this mutation.
+func (m *SubMutation) UpdateTimeCleared() bool {
+	_, ok := m.clearedFields[sub.FieldUpdateTime]
+	return ok
+}
+
 // ResetUpdateTime resets all changes to the "update_time" field.
 func (m *SubMutation) ResetUpdateTime() {
 	m.update_time = nil
+	delete(m.clearedFields, sub.FieldUpdateTime)
 }
 
 // Where appends a list predicates to the SubMutation builder.
@@ -1628,7 +1695,14 @@ func (m *SubMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *SubMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(sub.FieldCreateTime) {
+		fields = append(fields, sub.FieldCreateTime)
+	}
+	if m.FieldCleared(sub.FieldUpdateTime) {
+		fields = append(fields, sub.FieldUpdateTime)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1641,6 +1715,14 @@ func (m *SubMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *SubMutation) ClearField(name string) error {
+	switch name {
+	case sub.FieldCreateTime:
+		m.ClearCreateTime()
+		return nil
+	case sub.FieldUpdateTime:
+		m.ClearUpdateTime()
+		return nil
+	}
 	return fmt.Errorf("unknown Sub nullable field %s", name)
 }
 
@@ -2102,9 +2184,22 @@ func (m *SubBiliLiveMutation) OldCreateTime(ctx context.Context) (v time.Time, e
 	return oldValue.CreateTime, nil
 }
 
+// ClearCreateTime clears the value of the "create_time" field.
+func (m *SubBiliLiveMutation) ClearCreateTime() {
+	m.create_time = nil
+	m.clearedFields[subbililive.FieldCreateTime] = struct{}{}
+}
+
+// CreateTimeCleared returns if the "create_time" field was cleared in this mutation.
+func (m *SubBiliLiveMutation) CreateTimeCleared() bool {
+	_, ok := m.clearedFields[subbililive.FieldCreateTime]
+	return ok
+}
+
 // ResetCreateTime resets all changes to the "create_time" field.
 func (m *SubBiliLiveMutation) ResetCreateTime() {
 	m.create_time = nil
+	delete(m.clearedFields, subbililive.FieldCreateTime)
 }
 
 // SetUpdateTime sets the "update_time" field.
@@ -2138,9 +2233,22 @@ func (m *SubBiliLiveMutation) OldUpdateTime(ctx context.Context) (v time.Time, e
 	return oldValue.UpdateTime, nil
 }
 
+// ClearUpdateTime clears the value of the "update_time" field.
+func (m *SubBiliLiveMutation) ClearUpdateTime() {
+	m.update_time = nil
+	m.clearedFields[subbililive.FieldUpdateTime] = struct{}{}
+}
+
+// UpdateTimeCleared returns if the "update_time" field was cleared in this mutation.
+func (m *SubBiliLiveMutation) UpdateTimeCleared() bool {
+	_, ok := m.clearedFields[subbililive.FieldUpdateTime]
+	return ok
+}
+
 // ResetUpdateTime resets all changes to the "update_time" field.
 func (m *SubBiliLiveMutation) ResetUpdateTime() {
 	m.update_time = nil
+	delete(m.clearedFields, subbililive.FieldUpdateTime)
 }
 
 // Where appends a list predicates to the SubBiliLiveMutation builder.
@@ -2368,7 +2476,14 @@ func (m *SubBiliLiveMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *SubBiliLiveMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(subbililive.FieldCreateTime) {
+		fields = append(fields, subbililive.FieldCreateTime)
+	}
+	if m.FieldCleared(subbililive.FieldUpdateTime) {
+		fields = append(fields, subbililive.FieldUpdateTime)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -2381,6 +2496,14 @@ func (m *SubBiliLiveMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *SubBiliLiveMutation) ClearField(name string) error {
+	switch name {
+	case subbililive.FieldCreateTime:
+		m.ClearCreateTime()
+		return nil
+	case subbililive.FieldUpdateTime:
+		m.ClearUpdateTime()
+		return nil
+	}
 	return fmt.Errorf("unknown SubBiliLive nullable field %s", name)
 }
 

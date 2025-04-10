@@ -19,8 +19,8 @@ var (
 		{Name: "status", Type: field.TypeInt, Default: 1},
 		{Name: "last_online_time", Type: field.TypeTime},
 		{Name: "last_online_ip", Type: field.TypeString},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime, Nullable: true},
 	}
 	// BotsTable holds the schema information for the "bots" table.
 	BotsTable = &schema.Table{
@@ -36,8 +36,8 @@ var (
 		{Name: "sub_id", Type: field.TypeInt64},
 		{Name: "bot_id", Type: field.TypeInt64},
 		{Name: "status", Type: field.TypeInt, Default: 1},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime, Nullable: true},
 	}
 	// SubsTable holds the schema information for the "subs" table.
 	SubsTable = &schema.Table{
@@ -52,8 +52,8 @@ var (
 		{Name: "live_state", Type: field.TypeInt64},
 		{Name: "live_start_time", Type: field.TypeInt64},
 		{Name: "live_end_time", Type: field.TypeInt64},
-		{Name: "create_time", Type: field.TypeTime},
-		{Name: "update_time", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime, Nullable: true},
 	}
 	// SubBiliLiveTable holds the schema information for the "sub_bili_live" table.
 	SubBiliLiveTable = &schema.Table{

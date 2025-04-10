@@ -26,8 +26,8 @@ func (SubBiliLive) Fields() []ent.Field {
 		field.Int64("live_state"),
 		field.Int64("live_start_time"),
 		field.Int64("live_end_time"),
-		field.Time("create_time"),
-		field.Time("update_time"),
+		field.Time("create_time").Optional(),
+		field.Time("update_time").Optional(),
 	}
 }
 

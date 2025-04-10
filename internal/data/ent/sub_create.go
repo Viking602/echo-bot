@@ -64,9 +64,25 @@ func (sc *SubCreate) SetCreateTime(t time.Time) *SubCreate {
 	return sc
 }
 
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (sc *SubCreate) SetNillableCreateTime(t *time.Time) *SubCreate {
+	if t != nil {
+		sc.SetCreateTime(*t)
+	}
+	return sc
+}
+
 // SetUpdateTime sets the "update_time" field.
 func (sc *SubCreate) SetUpdateTime(t time.Time) *SubCreate {
 	sc.mutation.SetUpdateTime(t)
+	return sc
+}
+
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (sc *SubCreate) SetNillableUpdateTime(t *time.Time) *SubCreate {
+	if t != nil {
+		sc.SetUpdateTime(*t)
+	}
 	return sc
 }
 
@@ -133,12 +149,6 @@ func (sc *SubCreate) check() error {
 	}
 	if _, ok := sc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Sub.status"`)}
-	}
-	if _, ok := sc.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "Sub.create_time"`)}
-	}
-	if _, ok := sc.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "Sub.update_time"`)}
 	}
 	return nil
 }

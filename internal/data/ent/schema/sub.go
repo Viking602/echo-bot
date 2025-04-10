@@ -19,8 +19,8 @@ func (Sub) Fields() []ent.Field {
 		field.Int64("sub_id"),
 		field.Int64("bot_id"),
 		field.Int("status").Default(1),
-		field.Time("create_time"),
-		field.Time("update_time"),
+		field.Time("create_time").Optional(),
+		field.Time("update_time").Optional(),
 	}
 }
 

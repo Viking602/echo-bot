@@ -76,9 +76,25 @@ func (bc *BotCreate) SetCreateTime(t time.Time) *BotCreate {
 	return bc
 }
 
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (bc *BotCreate) SetNillableCreateTime(t *time.Time) *BotCreate {
+	if t != nil {
+		bc.SetCreateTime(*t)
+	}
+	return bc
+}
+
 // SetUpdateTime sets the "update_time" field.
 func (bc *BotCreate) SetUpdateTime(t time.Time) *BotCreate {
 	bc.mutation.SetUpdateTime(t)
+	return bc
+}
+
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (bc *BotCreate) SetNillableUpdateTime(t *time.Time) *BotCreate {
+	if t != nil {
+		bc.SetUpdateTime(*t)
+	}
 	return bc
 }
 
@@ -151,12 +167,6 @@ func (bc *BotCreate) check() error {
 	}
 	if _, ok := bc.mutation.LastOnlineIP(); !ok {
 		return &ValidationError{Name: "last_online_ip", err: errors.New(`ent: missing required field "Bot.last_online_ip"`)}
-	}
-	if _, ok := bc.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "Bot.create_time"`)}
-	}
-	if _, ok := bc.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "Bot.update_time"`)}
 	}
 	return nil
 }

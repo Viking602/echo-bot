@@ -147,6 +147,12 @@ func (su *SubUpdate) SetNillableCreateTime(t *time.Time) *SubUpdate {
 	return su
 }
 
+// ClearCreateTime clears the value of the "create_time" field.
+func (su *SubUpdate) ClearCreateTime() *SubUpdate {
+	su.mutation.ClearCreateTime()
+	return su
+}
+
 // SetUpdateTime sets the "update_time" field.
 func (su *SubUpdate) SetUpdateTime(t time.Time) *SubUpdate {
 	su.mutation.SetUpdateTime(t)
@@ -158,6 +164,12 @@ func (su *SubUpdate) SetNillableUpdateTime(t *time.Time) *SubUpdate {
 	if t != nil {
 		su.SetUpdateTime(*t)
 	}
+	return su
+}
+
+// ClearUpdateTime clears the value of the "update_time" field.
+func (su *SubUpdate) ClearUpdateTime() *SubUpdate {
+	su.mutation.ClearUpdateTime()
 	return su
 }
 
@@ -235,8 +247,14 @@ func (su *SubUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.CreateTime(); ok {
 		_spec.SetField(sub.FieldCreateTime, field.TypeTime, value)
 	}
+	if su.mutation.CreateTimeCleared() {
+		_spec.ClearField(sub.FieldCreateTime, field.TypeTime)
+	}
 	if value, ok := su.mutation.UpdateTime(); ok {
 		_spec.SetField(sub.FieldUpdateTime, field.TypeTime, value)
+	}
+	if su.mutation.UpdateTimeCleared() {
+		_spec.ClearField(sub.FieldUpdateTime, field.TypeTime)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -377,6 +395,12 @@ func (suo *SubUpdateOne) SetNillableCreateTime(t *time.Time) *SubUpdateOne {
 	return suo
 }
 
+// ClearCreateTime clears the value of the "create_time" field.
+func (suo *SubUpdateOne) ClearCreateTime() *SubUpdateOne {
+	suo.mutation.ClearCreateTime()
+	return suo
+}
+
 // SetUpdateTime sets the "update_time" field.
 func (suo *SubUpdateOne) SetUpdateTime(t time.Time) *SubUpdateOne {
 	suo.mutation.SetUpdateTime(t)
@@ -388,6 +412,12 @@ func (suo *SubUpdateOne) SetNillableUpdateTime(t *time.Time) *SubUpdateOne {
 	if t != nil {
 		suo.SetUpdateTime(*t)
 	}
+	return suo
+}
+
+// ClearUpdateTime clears the value of the "update_time" field.
+func (suo *SubUpdateOne) ClearUpdateTime() *SubUpdateOne {
+	suo.mutation.ClearUpdateTime()
 	return suo
 }
 
@@ -495,8 +525,14 @@ func (suo *SubUpdateOne) sqlSave(ctx context.Context) (_node *Sub, err error) {
 	if value, ok := suo.mutation.CreateTime(); ok {
 		_spec.SetField(sub.FieldCreateTime, field.TypeTime, value)
 	}
+	if suo.mutation.CreateTimeCleared() {
+		_spec.ClearField(sub.FieldCreateTime, field.TypeTime)
+	}
 	if value, ok := suo.mutation.UpdateTime(); ok {
 		_spec.SetField(sub.FieldUpdateTime, field.TypeTime, value)
+	}
+	if suo.mutation.UpdateTimeCleared() {
+		_spec.ClearField(sub.FieldUpdateTime, field.TypeTime)
 	}
 	_node = &Sub{config: suo.config}
 	_spec.Assign = _node.assignValues

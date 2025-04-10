@@ -50,9 +50,25 @@ func (sblc *SubBiliLiveCreate) SetCreateTime(t time.Time) *SubBiliLiveCreate {
 	return sblc
 }
 
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (sblc *SubBiliLiveCreate) SetNillableCreateTime(t *time.Time) *SubBiliLiveCreate {
+	if t != nil {
+		sblc.SetCreateTime(*t)
+	}
+	return sblc
+}
+
 // SetUpdateTime sets the "update_time" field.
 func (sblc *SubBiliLiveCreate) SetUpdateTime(t time.Time) *SubBiliLiveCreate {
 	sblc.mutation.SetUpdateTime(t)
+	return sblc
+}
+
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (sblc *SubBiliLiveCreate) SetNillableUpdateTime(t *time.Time) *SubBiliLiveCreate {
+	if t != nil {
+		sblc.SetUpdateTime(*t)
+	}
 	return sblc
 }
 
@@ -107,12 +123,6 @@ func (sblc *SubBiliLiveCreate) check() error {
 	}
 	if _, ok := sblc.mutation.LiveEndTime(); !ok {
 		return &ValidationError{Name: "live_end_time", err: errors.New(`ent: missing required field "SubBiliLive.live_end_time"`)}
-	}
-	if _, ok := sblc.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "SubBiliLive.create_time"`)}
-	}
-	if _, ok := sblc.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "SubBiliLive.update_time"`)}
 	}
 	return nil
 }

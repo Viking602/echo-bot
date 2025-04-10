@@ -126,6 +126,12 @@ func (sblu *SubBiliLiveUpdate) SetNillableCreateTime(t *time.Time) *SubBiliLiveU
 	return sblu
 }
 
+// ClearCreateTime clears the value of the "create_time" field.
+func (sblu *SubBiliLiveUpdate) ClearCreateTime() *SubBiliLiveUpdate {
+	sblu.mutation.ClearCreateTime()
+	return sblu
+}
+
 // SetUpdateTime sets the "update_time" field.
 func (sblu *SubBiliLiveUpdate) SetUpdateTime(t time.Time) *SubBiliLiveUpdate {
 	sblu.mutation.SetUpdateTime(t)
@@ -137,6 +143,12 @@ func (sblu *SubBiliLiveUpdate) SetNillableUpdateTime(t *time.Time) *SubBiliLiveU
 	if t != nil {
 		sblu.SetUpdateTime(*t)
 	}
+	return sblu
+}
+
+// ClearUpdateTime clears the value of the "update_time" field.
+func (sblu *SubBiliLiveUpdate) ClearUpdateTime() *SubBiliLiveUpdate {
+	sblu.mutation.ClearUpdateTime()
 	return sblu
 }
 
@@ -208,8 +220,14 @@ func (sblu *SubBiliLiveUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := sblu.mutation.CreateTime(); ok {
 		_spec.SetField(subbililive.FieldCreateTime, field.TypeTime, value)
 	}
+	if sblu.mutation.CreateTimeCleared() {
+		_spec.ClearField(subbililive.FieldCreateTime, field.TypeTime)
+	}
 	if value, ok := sblu.mutation.UpdateTime(); ok {
 		_spec.SetField(subbililive.FieldUpdateTime, field.TypeTime, value)
+	}
+	if sblu.mutation.UpdateTimeCleared() {
+		_spec.ClearField(subbililive.FieldUpdateTime, field.TypeTime)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, sblu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -329,6 +347,12 @@ func (sbluo *SubBiliLiveUpdateOne) SetNillableCreateTime(t *time.Time) *SubBiliL
 	return sbluo
 }
 
+// ClearCreateTime clears the value of the "create_time" field.
+func (sbluo *SubBiliLiveUpdateOne) ClearCreateTime() *SubBiliLiveUpdateOne {
+	sbluo.mutation.ClearCreateTime()
+	return sbluo
+}
+
 // SetUpdateTime sets the "update_time" field.
 func (sbluo *SubBiliLiveUpdateOne) SetUpdateTime(t time.Time) *SubBiliLiveUpdateOne {
 	sbluo.mutation.SetUpdateTime(t)
@@ -340,6 +364,12 @@ func (sbluo *SubBiliLiveUpdateOne) SetNillableUpdateTime(t *time.Time) *SubBiliL
 	if t != nil {
 		sbluo.SetUpdateTime(*t)
 	}
+	return sbluo
+}
+
+// ClearUpdateTime clears the value of the "update_time" field.
+func (sbluo *SubBiliLiveUpdateOne) ClearUpdateTime() *SubBiliLiveUpdateOne {
+	sbluo.mutation.ClearUpdateTime()
 	return sbluo
 }
 
@@ -441,8 +471,14 @@ func (sbluo *SubBiliLiveUpdateOne) sqlSave(ctx context.Context) (_node *SubBiliL
 	if value, ok := sbluo.mutation.CreateTime(); ok {
 		_spec.SetField(subbililive.FieldCreateTime, field.TypeTime, value)
 	}
+	if sbluo.mutation.CreateTimeCleared() {
+		_spec.ClearField(subbililive.FieldCreateTime, field.TypeTime)
+	}
 	if value, ok := sbluo.mutation.UpdateTime(); ok {
 		_spec.SetField(subbililive.FieldUpdateTime, field.TypeTime, value)
+	}
+	if sbluo.mutation.UpdateTimeCleared() {
+		_spec.ClearField(subbililive.FieldUpdateTime, field.TypeTime)
 	}
 	_node = &SubBiliLive{config: sbluo.config}
 	_spec.Assign = _node.assignValues

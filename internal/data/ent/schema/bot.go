@@ -21,8 +21,8 @@ func (Bot) Fields() []ent.Field {
 		field.Int("status").Default(1),
 		field.Time("last_online_time"),
 		field.String("last_online_ip"),
-		field.Time("create_time"),
-		field.Time("update_time"),
+		field.Time("create_time").Optional(),
+		field.Time("update_time").Optional(),
 	}
 }
 

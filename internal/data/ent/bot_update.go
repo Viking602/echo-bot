@@ -161,6 +161,12 @@ func (bu *BotUpdate) SetNillableCreateTime(t *time.Time) *BotUpdate {
 	return bu
 }
 
+// ClearCreateTime clears the value of the "create_time" field.
+func (bu *BotUpdate) ClearCreateTime() *BotUpdate {
+	bu.mutation.ClearCreateTime()
+	return bu
+}
+
 // SetUpdateTime sets the "update_time" field.
 func (bu *BotUpdate) SetUpdateTime(t time.Time) *BotUpdate {
 	bu.mutation.SetUpdateTime(t)
@@ -172,6 +178,12 @@ func (bu *BotUpdate) SetNillableUpdateTime(t *time.Time) *BotUpdate {
 	if t != nil {
 		bu.SetUpdateTime(*t)
 	}
+	return bu
+}
+
+// ClearUpdateTime clears the value of the "update_time" field.
+func (bu *BotUpdate) ClearUpdateTime() *BotUpdate {
+	bu.mutation.ClearUpdateTime()
 	return bu
 }
 
@@ -249,8 +261,14 @@ func (bu *BotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := bu.mutation.CreateTime(); ok {
 		_spec.SetField(bot.FieldCreateTime, field.TypeTime, value)
 	}
+	if bu.mutation.CreateTimeCleared() {
+		_spec.ClearField(bot.FieldCreateTime, field.TypeTime)
+	}
 	if value, ok := bu.mutation.UpdateTime(); ok {
 		_spec.SetField(bot.FieldUpdateTime, field.TypeTime, value)
+	}
+	if bu.mutation.UpdateTimeCleared() {
+		_spec.ClearField(bot.FieldUpdateTime, field.TypeTime)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, bu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -405,6 +423,12 @@ func (buo *BotUpdateOne) SetNillableCreateTime(t *time.Time) *BotUpdateOne {
 	return buo
 }
 
+// ClearCreateTime clears the value of the "create_time" field.
+func (buo *BotUpdateOne) ClearCreateTime() *BotUpdateOne {
+	buo.mutation.ClearCreateTime()
+	return buo
+}
+
 // SetUpdateTime sets the "update_time" field.
 func (buo *BotUpdateOne) SetUpdateTime(t time.Time) *BotUpdateOne {
 	buo.mutation.SetUpdateTime(t)
@@ -416,6 +440,12 @@ func (buo *BotUpdateOne) SetNillableUpdateTime(t *time.Time) *BotUpdateOne {
 	if t != nil {
 		buo.SetUpdateTime(*t)
 	}
+	return buo
+}
+
+// ClearUpdateTime clears the value of the "update_time" field.
+func (buo *BotUpdateOne) ClearUpdateTime() *BotUpdateOne {
+	buo.mutation.ClearUpdateTime()
 	return buo
 }
 
@@ -523,8 +553,14 @@ func (buo *BotUpdateOne) sqlSave(ctx context.Context) (_node *Bot, err error) {
 	if value, ok := buo.mutation.CreateTime(); ok {
 		_spec.SetField(bot.FieldCreateTime, field.TypeTime, value)
 	}
+	if buo.mutation.CreateTimeCleared() {
+		_spec.ClearField(bot.FieldCreateTime, field.TypeTime)
+	}
 	if value, ok := buo.mutation.UpdateTime(); ok {
 		_spec.SetField(bot.FieldUpdateTime, field.TypeTime, value)
+	}
+	if buo.mutation.UpdateTimeCleared() {
+		_spec.ClearField(bot.FieldUpdateTime, field.TypeTime)
 	}
 	_node = &Bot{config: buo.config}
 	_spec.Assign = _node.assignValues

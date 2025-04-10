@@ -284,6 +284,16 @@ func CreateTimeLTE(v time.Time) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldLTE(FieldCreateTime, v))
 }
 
+// CreateTimeIsNil applies the IsNil predicate on the "create_time" field.
+func CreateTimeIsNil() predicate.SubBiliLive {
+	return predicate.SubBiliLive(sql.FieldIsNull(FieldCreateTime))
+}
+
+// CreateTimeNotNil applies the NotNil predicate on the "create_time" field.
+func CreateTimeNotNil() predicate.SubBiliLive {
+	return predicate.SubBiliLive(sql.FieldNotNull(FieldCreateTime))
+}
+
 // UpdateTimeEQ applies the EQ predicate on the "update_time" field.
 func UpdateTimeEQ(v time.Time) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldEQ(FieldUpdateTime, v))
@@ -322,6 +332,16 @@ func UpdateTimeLT(v time.Time) predicate.SubBiliLive {
 // UpdateTimeLTE applies the LTE predicate on the "update_time" field.
 func UpdateTimeLTE(v time.Time) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldLTE(FieldUpdateTime, v))
+}
+
+// UpdateTimeIsNil applies the IsNil predicate on the "update_time" field.
+func UpdateTimeIsNil() predicate.SubBiliLive {
+	return predicate.SubBiliLive(sql.FieldIsNull(FieldUpdateTime))
+}
+
+// UpdateTimeNotNil applies the NotNil predicate on the "update_time" field.
+func UpdateTimeNotNil() predicate.SubBiliLive {
+	return predicate.SubBiliLive(sql.FieldNotNull(FieldUpdateTime))
 }
 
 // And groups predicates with the AND operator between them.
