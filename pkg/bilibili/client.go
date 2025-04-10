@@ -1,19 +1,16 @@
 package bilibili
 
 import (
-	"echo/pkg/logger"
 	"github.com/imroc/req/v3"
 	"time"
 )
 
 type Client struct {
 	client *req.Client
-	logger *logger.Logger
 }
 
-func NewClient(logger *logger.Logger) *Client {
+func NewClient() *Client {
 	client := req.C().
-		SetLogger(logger).
 		SetTLSFingerprintChrome().
 		ImpersonateChrome().
 		SetCommonRetryCount(3).
@@ -21,6 +18,5 @@ func NewClient(logger *logger.Logger) *Client {
 
 	return &Client{
 		client: client,
-		logger: logger,
 	}
 }

@@ -1,4 +1,4 @@
-package app
+package bot
 
 import (
 	"context"
@@ -15,6 +15,7 @@ import (
 type Handler struct {
 	gws.BuiltinEventHandler
 	conns       map[*gws.Conn]struct{}
+	botConnMap  map[int64]*gws.Conn
 	mu          sync.Mutex
 	registry    *registry.CommandRegistry
 	logger      *logger.Logger
@@ -33,10 +34,11 @@ type Handler struct {
 
 func NewBotHandler(registry *registry.CommandRegistry, log *logger.Logger, bot *biz.BotUsecase) *Handler {
 	return &Handler{
-		registry: registry,
-		logger:   log,
-		bot:      bot,
-		conns:    make(map[*gws.Conn]struct{}),
+		registry:   registry,
+		logger:     log,
+		bot:        bot,
+		conns:      make(map[*gws.Conn]struct{}),
+		botConnMap: make(map[int64]*gws.Conn),
 		apiHandlers: make(map[*gws.Conn][]struct {
 			handler func(*model.OneBotMessage, map[string]interface{}) string
 			msg     *model.OneBotMessage
@@ -63,6 +65,14 @@ func (h *Handler) OnClose(socket *gws.Conn, err error) {
 	h.mu.Lock()
 	delete(h.conns, socket)
 	h.mu.Unlock()
+}
+
+func (h *Handler) saveConnWithBotId(socket *gws.Conn, botId int64) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	h.botConnMap[botId] = socket
+	h.logger.Info().Int64("botId", botId).Msg("已将botId与连接关联")
 }
 
 func (h *Handler) OnMessage(socket *gws.Conn, message *gws.Message) {
@@ -101,6 +111,11 @@ func (h *Handler) OnMessage(socket *gws.Conn, message *gws.Message) {
 		}
 
 		if msg.PostType == "message" {
+			if msg.MessageType == "private" {
+				h.logger.Info().Str("原文", msg.RawMessage).Int64("接收者", msg.SelfId).Int64("发送者", msg.UserId).Msg("[私信]")
+			} else if msg.MessageType == "group" {
+				h.logger.Info().Int64("发送者", msg.UserId).Int64("接收者", msg.SelfId).Int64("群号", msg.GroupId).Str("原文", msg.RawMessage).Msg("[群消息]")
+			}
 			reply, ok := h.registry.Execute(&msg)
 			if ok {
 				h.sendReply(socket, &msg, reply)
@@ -191,6 +206,7 @@ func (h *Handler) metaEvent(msg *model.OneBotMessage, socket *gws.Conn) {
 	ctx := context.Background()
 	if msg.MetaEventType == "lifecycle" && msg.SubType == "connect" {
 		h.logger.Info().Int64("bot", msg.SelfId).Msg("BOT连接成功")
+		h.saveConnWithBotId(socket, msg.SelfId)
 		val, exits := socket.Session().Load("token")
 		if !exits {
 			h.logger.Error().Str("app", "echo").Msg("获取 BOT 令牌失败")
@@ -223,7 +239,7 @@ func (h *Handler) handleAPIResponse(socket *gws.Conn, data map[string]interface{
 	apiQueue, apiOk := h.apiHandlers[socket]
 	sendQueue, sendOk := h.sendHandlers[socket]
 	if !apiOk && !sendOk {
-		h.logger.Error().Str("app", "echo").Msg("无法处理消息")
+		h.logger.Info().Msg("主动推送消息无需处理")
 		return
 	}
 
@@ -248,7 +264,7 @@ func (h *Handler) handleAPIResponse(socket *gws.Conn, data map[string]interface{
 		reply := handler.handler(handler.msg, data)
 		h.sendReply(socket, handler.msg, reply)
 	} else {
-		h.logger.Error().Str("app", "echo").Msg("无法处理消息")
+		h.logger.Info().Msg("主动推送消息无需处理")
 	}
 }
 
@@ -269,5 +285,40 @@ func (h *Handler) handleSendResponse(socket *gws.Conn, msg *model.OneBotMessage,
 			Int64("groupId", msg.GroupId).
 			Int64("botId", msg.UserId).
 			Msg("消息发送失败")
+	}
+}
+
+func (h *Handler) GetConnByBotId(botId int64) (*gws.Conn, bool) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	conn, exists := h.botConnMap[botId]
+	return conn, exists
+}
+
+func (h *Handler) SendGroupMessage(groupID int64, message string, socket *gws.Conn) {
+
+	action := model.OneBotAction{
+		Action: "send_group_msg",
+		Params: model.SendMessageParams{
+			GroupID:    groupID,
+			Message:    message,
+			AutoEscape: false,
+		},
+	}
+
+	actionBytes, _ := json.Marshal(action)
+
+	if _, ok := h.conns[socket]; ok {
+		if err := socket.WriteMessage(gws.OpcodeText, actionBytes); err != nil {
+			h.logger.Error().
+				Str("app", "echo").
+				AnErr("err", err).
+				Str("content", message).
+				Msg("消息发送失败")
+		}
+		h.logger.Info().Str("content", message).Msg("消息已发送")
+	} else {
+		h.logger.Error().Str("app", "echo").Msg("消息发送失败，无可用链接")
 	}
 }

@@ -9,15 +9,17 @@ package main
 import (
 	"echo/internal/app"
 	"echo/internal/biz"
+	"echo/internal/bot"
 	"echo/internal/command"
 	"echo/internal/data"
 	"echo/internal/service"
+	"echo/internal/task"
 	"echo/pkg/logger"
 )
 
 // Injectors from wire.go:
 
-func wireApp(log *logger.Logger) (*app.Bot, error) {
+func wireApp(log *logger.Logger) (*app.App, error) {
 	dataData, err := data.NewData()
 	if err != nil {
 		return nil, err
@@ -25,8 +27,16 @@ func wireApp(log *logger.Logger) (*app.Bot, error) {
 	botRepo := data.NewBotRepo(dataData)
 	botUsecase := biz.NewBotUsecase(botRepo)
 	setMasterService := service.NewSetMasterService(botUsecase)
-	commandRegistry := command.NewInitializedRegistry(setMasterService)
-	handler := app.NewBotHandler(commandRegistry, log, botUsecase)
-	bot := app.NewBot(handler)
-	return bot, nil
+	subBiliLiveRepo := data.NewSubBiliLiveRepo(dataData)
+	subBiliLiveUsecase := biz.NewSubBiliLiveUsecase(subBiliLiveRepo)
+	subRepo := data.NewSubRepo(dataData)
+	subUsecase := biz.NewSubUsecase(subRepo)
+	liveAddService := service.NewLiveAddService(subBiliLiveUsecase, subUsecase, log)
+	commandRegistry := command.NewInitializedRegistry(setMasterService, liveAddService)
+	handler := bot.NewBotHandler(commandRegistry, log, botUsecase)
+	botBot := bot.NewBot(handler)
+	biliTask := task.NewBiliTask(log, handler, subUsecase, subBiliLiveUsecase)
+	taskTask := task.NewTask(log, biliTask)
+	appApp := app.NewApp(botBot, taskTask)
+	return appApp, nil
 }

@@ -82,3 +82,40 @@ type StudioInfo struct {
 	Status     int64         `json:"status"`
 	MasterList []interface{} `json:"master_list"`
 }
+
+type MasterInfoAPI struct {
+	Code    int    `json:"code"`
+	Msg     string `json:"msg"`
+	Message string `json:"message"`
+	Data    struct {
+		Info struct {
+			Uid            int    `json:"uid"`
+			Uname          string `json:"uname"`
+			Face           string `json:"face"`
+			OfficialVerify struct {
+				Type int    `json:"type"`
+				Desc string `json:"desc"`
+			} `json:"official_verify"`
+			Gender int `json:"gender"`
+		} `json:"info"`
+		Exp struct {
+			MasterLevel struct {
+				Level   int   `json:"level"`
+				Color   int   `json:"color"`
+				Current []int `json:"current"`
+				Next    []int `json:"next"`
+			} `json:"master_level"`
+		} `json:"exp"`
+		FollowerNum  int    `json:"follower_num"`
+		RoomId       int    `json:"room_id"`
+		MedalName    string `json:"medal_name"`
+		GloryCount   int    `json:"glory_count"`
+		Pendant      string `json:"pendant"`
+		LinkGroupNum int    `json:"link_group_num"`
+		RoomNews     struct {
+			Content   string `json:"content"`
+			Ctime     string `json:"ctime"`
+			CtimeText string `json:"ctime_text"`
+		} `json:"room_news"`
+	} `json:"data"`
+}

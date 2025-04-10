@@ -24,8 +24,8 @@ func (SubBiliLive) Fields() []ent.Field {
 		field.Int64("id").Unique(),
 		field.Int64("room_id"),
 		field.Int64("live_state"),
-		field.Time("live_start_time"),
-		field.Time("live_end_time"),
+		field.Int64("live_start_time"),
+		field.Int64("live_end_time"),
 		field.Time("create_time"),
 		field.Time("update_time"),
 	}

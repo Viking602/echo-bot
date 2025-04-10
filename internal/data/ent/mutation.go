@@ -1724,21 +1724,23 @@ func (m *SubMutation) ResetEdge(name string) error {
 // SubBiliLiveMutation represents an operation that mutates the SubBiliLive nodes in the graph.
 type SubBiliLiveMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int64
-	room_id         *int64
-	addroom_id      *int64
-	live_state      *int64
-	addlive_state   *int64
-	live_start_time *time.Time
-	live_end_time   *time.Time
-	create_time     *time.Time
-	update_time     *time.Time
-	clearedFields   map[string]struct{}
-	done            bool
-	oldValue        func(context.Context) (*SubBiliLive, error)
-	predicates      []predicate.SubBiliLive
+	op                 Op
+	typ                string
+	id                 *int64
+	room_id            *int64
+	addroom_id         *int64
+	live_state         *int64
+	addlive_state      *int64
+	live_start_time    *int64
+	addlive_start_time *int64
+	live_end_time      *int64
+	addlive_end_time   *int64
+	create_time        *time.Time
+	update_time        *time.Time
+	clearedFields      map[string]struct{}
+	done               bool
+	oldValue           func(context.Context) (*SubBiliLive, error)
+	predicates         []predicate.SubBiliLive
 }
 
 var _ ent.Mutation = (*SubBiliLiveMutation)(nil)
@@ -1958,12 +1960,13 @@ func (m *SubBiliLiveMutation) ResetLiveState() {
 }
 
 // SetLiveStartTime sets the "live_start_time" field.
-func (m *SubBiliLiveMutation) SetLiveStartTime(t time.Time) {
-	m.live_start_time = &t
+func (m *SubBiliLiveMutation) SetLiveStartTime(i int64) {
+	m.live_start_time = &i
+	m.addlive_start_time = nil
 }
 
 // LiveStartTime returns the value of the "live_start_time" field in the mutation.
-func (m *SubBiliLiveMutation) LiveStartTime() (r time.Time, exists bool) {
+func (m *SubBiliLiveMutation) LiveStartTime() (r int64, exists bool) {
 	v := m.live_start_time
 	if v == nil {
 		return
@@ -1974,7 +1977,7 @@ func (m *SubBiliLiveMutation) LiveStartTime() (r time.Time, exists bool) {
 // OldLiveStartTime returns the old "live_start_time" field's value of the SubBiliLive entity.
 // If the SubBiliLive object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubBiliLiveMutation) OldLiveStartTime(ctx context.Context) (v time.Time, err error) {
+func (m *SubBiliLiveMutation) OldLiveStartTime(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldLiveStartTime is only allowed on UpdateOne operations")
 	}
@@ -1988,18 +1991,38 @@ func (m *SubBiliLiveMutation) OldLiveStartTime(ctx context.Context) (v time.Time
 	return oldValue.LiveStartTime, nil
 }
 
+// AddLiveStartTime adds i to the "live_start_time" field.
+func (m *SubBiliLiveMutation) AddLiveStartTime(i int64) {
+	if m.addlive_start_time != nil {
+		*m.addlive_start_time += i
+	} else {
+		m.addlive_start_time = &i
+	}
+}
+
+// AddedLiveStartTime returns the value that was added to the "live_start_time" field in this mutation.
+func (m *SubBiliLiveMutation) AddedLiveStartTime() (r int64, exists bool) {
+	v := m.addlive_start_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetLiveStartTime resets all changes to the "live_start_time" field.
 func (m *SubBiliLiveMutation) ResetLiveStartTime() {
 	m.live_start_time = nil
+	m.addlive_start_time = nil
 }
 
 // SetLiveEndTime sets the "live_end_time" field.
-func (m *SubBiliLiveMutation) SetLiveEndTime(t time.Time) {
-	m.live_end_time = &t
+func (m *SubBiliLiveMutation) SetLiveEndTime(i int64) {
+	m.live_end_time = &i
+	m.addlive_end_time = nil
 }
 
 // LiveEndTime returns the value of the "live_end_time" field in the mutation.
-func (m *SubBiliLiveMutation) LiveEndTime() (r time.Time, exists bool) {
+func (m *SubBiliLiveMutation) LiveEndTime() (r int64, exists bool) {
 	v := m.live_end_time
 	if v == nil {
 		return
@@ -2010,7 +2033,7 @@ func (m *SubBiliLiveMutation) LiveEndTime() (r time.Time, exists bool) {
 // OldLiveEndTime returns the old "live_end_time" field's value of the SubBiliLive entity.
 // If the SubBiliLive object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubBiliLiveMutation) OldLiveEndTime(ctx context.Context) (v time.Time, err error) {
+func (m *SubBiliLiveMutation) OldLiveEndTime(ctx context.Context) (v int64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldLiveEndTime is only allowed on UpdateOne operations")
 	}
@@ -2024,9 +2047,28 @@ func (m *SubBiliLiveMutation) OldLiveEndTime(ctx context.Context) (v time.Time, 
 	return oldValue.LiveEndTime, nil
 }
 
+// AddLiveEndTime adds i to the "live_end_time" field.
+func (m *SubBiliLiveMutation) AddLiveEndTime(i int64) {
+	if m.addlive_end_time != nil {
+		*m.addlive_end_time += i
+	} else {
+		m.addlive_end_time = &i
+	}
+}
+
+// AddedLiveEndTime returns the value that was added to the "live_end_time" field in this mutation.
+func (m *SubBiliLiveMutation) AddedLiveEndTime() (r int64, exists bool) {
+	v := m.addlive_end_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetLiveEndTime resets all changes to the "live_end_time" field.
 func (m *SubBiliLiveMutation) ResetLiveEndTime() {
 	m.live_end_time = nil
+	m.addlive_end_time = nil
 }
 
 // SetCreateTime sets the "create_time" field.
@@ -2219,14 +2261,14 @@ func (m *SubBiliLiveMutation) SetField(name string, value ent.Value) error {
 		m.SetLiveState(v)
 		return nil
 	case subbililive.FieldLiveStartTime:
-		v, ok := value.(time.Time)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLiveStartTime(v)
 		return nil
 	case subbililive.FieldLiveEndTime:
-		v, ok := value.(time.Time)
+		v, ok := value.(int64)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -2260,6 +2302,12 @@ func (m *SubBiliLiveMutation) AddedFields() []string {
 	if m.addlive_state != nil {
 		fields = append(fields, subbililive.FieldLiveState)
 	}
+	if m.addlive_start_time != nil {
+		fields = append(fields, subbililive.FieldLiveStartTime)
+	}
+	if m.addlive_end_time != nil {
+		fields = append(fields, subbililive.FieldLiveEndTime)
+	}
 	return fields
 }
 
@@ -2272,6 +2320,10 @@ func (m *SubBiliLiveMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedRoomID()
 	case subbililive.FieldLiveState:
 		return m.AddedLiveState()
+	case subbililive.FieldLiveStartTime:
+		return m.AddedLiveStartTime()
+	case subbililive.FieldLiveEndTime:
+		return m.AddedLiveEndTime()
 	}
 	return nil, false
 }
@@ -2294,6 +2346,20 @@ func (m *SubBiliLiveMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddLiveState(v)
+		return nil
+	case subbililive.FieldLiveStartTime:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLiveStartTime(v)
+		return nil
+	case subbililive.FieldLiveEndTime:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLiveEndTime(v)
 		return nil
 	}
 	return fmt.Errorf("unknown SubBiliLive numeric field %s", name)

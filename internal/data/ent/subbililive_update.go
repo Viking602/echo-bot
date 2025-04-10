@@ -71,30 +71,44 @@ func (sblu *SubBiliLiveUpdate) AddLiveState(i int64) *SubBiliLiveUpdate {
 }
 
 // SetLiveStartTime sets the "live_start_time" field.
-func (sblu *SubBiliLiveUpdate) SetLiveStartTime(t time.Time) *SubBiliLiveUpdate {
-	sblu.mutation.SetLiveStartTime(t)
+func (sblu *SubBiliLiveUpdate) SetLiveStartTime(i int64) *SubBiliLiveUpdate {
+	sblu.mutation.ResetLiveStartTime()
+	sblu.mutation.SetLiveStartTime(i)
 	return sblu
 }
 
 // SetNillableLiveStartTime sets the "live_start_time" field if the given value is not nil.
-func (sblu *SubBiliLiveUpdate) SetNillableLiveStartTime(t *time.Time) *SubBiliLiveUpdate {
-	if t != nil {
-		sblu.SetLiveStartTime(*t)
+func (sblu *SubBiliLiveUpdate) SetNillableLiveStartTime(i *int64) *SubBiliLiveUpdate {
+	if i != nil {
+		sblu.SetLiveStartTime(*i)
 	}
+	return sblu
+}
+
+// AddLiveStartTime adds i to the "live_start_time" field.
+func (sblu *SubBiliLiveUpdate) AddLiveStartTime(i int64) *SubBiliLiveUpdate {
+	sblu.mutation.AddLiveStartTime(i)
 	return sblu
 }
 
 // SetLiveEndTime sets the "live_end_time" field.
-func (sblu *SubBiliLiveUpdate) SetLiveEndTime(t time.Time) *SubBiliLiveUpdate {
-	sblu.mutation.SetLiveEndTime(t)
+func (sblu *SubBiliLiveUpdate) SetLiveEndTime(i int64) *SubBiliLiveUpdate {
+	sblu.mutation.ResetLiveEndTime()
+	sblu.mutation.SetLiveEndTime(i)
 	return sblu
 }
 
 // SetNillableLiveEndTime sets the "live_end_time" field if the given value is not nil.
-func (sblu *SubBiliLiveUpdate) SetNillableLiveEndTime(t *time.Time) *SubBiliLiveUpdate {
-	if t != nil {
-		sblu.SetLiveEndTime(*t)
+func (sblu *SubBiliLiveUpdate) SetNillableLiveEndTime(i *int64) *SubBiliLiveUpdate {
+	if i != nil {
+		sblu.SetLiveEndTime(*i)
 	}
+	return sblu
+}
+
+// AddLiveEndTime adds i to the "live_end_time" field.
+func (sblu *SubBiliLiveUpdate) AddLiveEndTime(i int64) *SubBiliLiveUpdate {
+	sblu.mutation.AddLiveEndTime(i)
 	return sblu
 }
 
@@ -180,10 +194,16 @@ func (sblu *SubBiliLiveUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.AddField(subbililive.FieldLiveState, field.TypeInt64, value)
 	}
 	if value, ok := sblu.mutation.LiveStartTime(); ok {
-		_spec.SetField(subbililive.FieldLiveStartTime, field.TypeTime, value)
+		_spec.SetField(subbililive.FieldLiveStartTime, field.TypeInt64, value)
+	}
+	if value, ok := sblu.mutation.AddedLiveStartTime(); ok {
+		_spec.AddField(subbililive.FieldLiveStartTime, field.TypeInt64, value)
 	}
 	if value, ok := sblu.mutation.LiveEndTime(); ok {
-		_spec.SetField(subbililive.FieldLiveEndTime, field.TypeTime, value)
+		_spec.SetField(subbililive.FieldLiveEndTime, field.TypeInt64, value)
+	}
+	if value, ok := sblu.mutation.AddedLiveEndTime(); ok {
+		_spec.AddField(subbililive.FieldLiveEndTime, field.TypeInt64, value)
 	}
 	if value, ok := sblu.mutation.CreateTime(); ok {
 		_spec.SetField(subbililive.FieldCreateTime, field.TypeTime, value)
@@ -254,30 +274,44 @@ func (sbluo *SubBiliLiveUpdateOne) AddLiveState(i int64) *SubBiliLiveUpdateOne {
 }
 
 // SetLiveStartTime sets the "live_start_time" field.
-func (sbluo *SubBiliLiveUpdateOne) SetLiveStartTime(t time.Time) *SubBiliLiveUpdateOne {
-	sbluo.mutation.SetLiveStartTime(t)
+func (sbluo *SubBiliLiveUpdateOne) SetLiveStartTime(i int64) *SubBiliLiveUpdateOne {
+	sbluo.mutation.ResetLiveStartTime()
+	sbluo.mutation.SetLiveStartTime(i)
 	return sbluo
 }
 
 // SetNillableLiveStartTime sets the "live_start_time" field if the given value is not nil.
-func (sbluo *SubBiliLiveUpdateOne) SetNillableLiveStartTime(t *time.Time) *SubBiliLiveUpdateOne {
-	if t != nil {
-		sbluo.SetLiveStartTime(*t)
+func (sbluo *SubBiliLiveUpdateOne) SetNillableLiveStartTime(i *int64) *SubBiliLiveUpdateOne {
+	if i != nil {
+		sbluo.SetLiveStartTime(*i)
 	}
+	return sbluo
+}
+
+// AddLiveStartTime adds i to the "live_start_time" field.
+func (sbluo *SubBiliLiveUpdateOne) AddLiveStartTime(i int64) *SubBiliLiveUpdateOne {
+	sbluo.mutation.AddLiveStartTime(i)
 	return sbluo
 }
 
 // SetLiveEndTime sets the "live_end_time" field.
-func (sbluo *SubBiliLiveUpdateOne) SetLiveEndTime(t time.Time) *SubBiliLiveUpdateOne {
-	sbluo.mutation.SetLiveEndTime(t)
+func (sbluo *SubBiliLiveUpdateOne) SetLiveEndTime(i int64) *SubBiliLiveUpdateOne {
+	sbluo.mutation.ResetLiveEndTime()
+	sbluo.mutation.SetLiveEndTime(i)
 	return sbluo
 }
 
 // SetNillableLiveEndTime sets the "live_end_time" field if the given value is not nil.
-func (sbluo *SubBiliLiveUpdateOne) SetNillableLiveEndTime(t *time.Time) *SubBiliLiveUpdateOne {
-	if t != nil {
-		sbluo.SetLiveEndTime(*t)
+func (sbluo *SubBiliLiveUpdateOne) SetNillableLiveEndTime(i *int64) *SubBiliLiveUpdateOne {
+	if i != nil {
+		sbluo.SetLiveEndTime(*i)
 	}
+	return sbluo
+}
+
+// AddLiveEndTime adds i to the "live_end_time" field.
+func (sbluo *SubBiliLiveUpdateOne) AddLiveEndTime(i int64) *SubBiliLiveUpdateOne {
+	sbluo.mutation.AddLiveEndTime(i)
 	return sbluo
 }
 
@@ -393,10 +427,16 @@ func (sbluo *SubBiliLiveUpdateOne) sqlSave(ctx context.Context) (_node *SubBiliL
 		_spec.AddField(subbililive.FieldLiveState, field.TypeInt64, value)
 	}
 	if value, ok := sbluo.mutation.LiveStartTime(); ok {
-		_spec.SetField(subbililive.FieldLiveStartTime, field.TypeTime, value)
+		_spec.SetField(subbililive.FieldLiveStartTime, field.TypeInt64, value)
+	}
+	if value, ok := sbluo.mutation.AddedLiveStartTime(); ok {
+		_spec.AddField(subbililive.FieldLiveStartTime, field.TypeInt64, value)
 	}
 	if value, ok := sbluo.mutation.LiveEndTime(); ok {
-		_spec.SetField(subbililive.FieldLiveEndTime, field.TypeTime, value)
+		_spec.SetField(subbililive.FieldLiveEndTime, field.TypeInt64, value)
+	}
+	if value, ok := sbluo.mutation.AddedLiveEndTime(); ok {
+		_spec.AddField(subbililive.FieldLiveEndTime, field.TypeInt64, value)
 	}
 	if value, ok := sbluo.mutation.CreateTime(); ok {
 		_spec.SetField(subbililive.FieldCreateTime, field.TypeTime, value)

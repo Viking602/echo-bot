@@ -50,8 +50,8 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "room_id", Type: field.TypeInt64},
 		{Name: "live_state", Type: field.TypeInt64},
-		{Name: "live_start_time", Type: field.TypeTime},
-		{Name: "live_end_time", Type: field.TypeTime},
+		{Name: "live_start_time", Type: field.TypeInt64},
+		{Name: "live_end_time", Type: field.TypeInt64},
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
 	}

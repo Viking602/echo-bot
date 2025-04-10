@@ -9,11 +9,12 @@ import (
 )
 
 var (
-	ProviderSet = wire.NewSet(NewData, NewBotRepo)
+	ProviderSet = wire.NewSet(NewData, NewBotRepo, NewSubRepo, NewSubBiliLiveRepo)
 )
 
 type Data struct {
 	db *ent.Client
+	//rds *redis.Client
 }
 
 func NewData() (*Data, error) {
@@ -28,3 +29,14 @@ func NewData() (*Data, error) {
 		db: client,
 	}, nil
 }
+
+//func NewRds() (*Data, error) {
+//	client := redis.NewClient(&redis.Options{
+//		Addr:     os.Getenv("REDIS_ADDR"),
+//		Password: os.Getenv("REDIS_PASSWORD"),
+//		DB:       0,
+//	})
+//	return &Data{
+//		rds: client,
+//	}, nil
+//}

@@ -22,9 +22,9 @@ type SubBiliLive struct {
 	// LiveState holds the value of the "live_state" field.
 	LiveState int64 `json:"live_state,omitempty"`
 	// LiveStartTime holds the value of the "live_start_time" field.
-	LiveStartTime time.Time `json:"live_start_time,omitempty"`
+	LiveStartTime int64 `json:"live_start_time,omitempty"`
 	// LiveEndTime holds the value of the "live_end_time" field.
-	LiveEndTime time.Time `json:"live_end_time,omitempty"`
+	LiveEndTime int64 `json:"live_end_time,omitempty"`
 	// CreateTime holds the value of the "create_time" field.
 	CreateTime time.Time `json:"create_time,omitempty"`
 	// UpdateTime holds the value of the "update_time" field.
@@ -37,9 +37,9 @@ func (*SubBiliLive) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case subbililive.FieldID, subbililive.FieldRoomID, subbililive.FieldLiveState:
+		case subbililive.FieldID, subbililive.FieldRoomID, subbililive.FieldLiveState, subbililive.FieldLiveStartTime, subbililive.FieldLiveEndTime:
 			values[i] = new(sql.NullInt64)
-		case subbililive.FieldLiveStartTime, subbililive.FieldLiveEndTime, subbililive.FieldCreateTime, subbililive.FieldUpdateTime:
+		case subbililive.FieldCreateTime, subbililive.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -75,16 +75,16 @@ func (sbl *SubBiliLive) assignValues(columns []string, values []any) error {
 				sbl.LiveState = value.Int64
 			}
 		case subbililive.FieldLiveStartTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field live_start_time", values[i])
 			} else if value.Valid {
-				sbl.LiveStartTime = value.Time
+				sbl.LiveStartTime = value.Int64
 			}
 		case subbililive.FieldLiveEndTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field live_end_time", values[i])
 			} else if value.Valid {
-				sbl.LiveEndTime = value.Time
+				sbl.LiveEndTime = value.Int64
 			}
 		case subbililive.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -141,10 +141,10 @@ func (sbl *SubBiliLive) String() string {
 	builder.WriteString(fmt.Sprintf("%v", sbl.LiveState))
 	builder.WriteString(", ")
 	builder.WriteString("live_start_time=")
-	builder.WriteString(sbl.LiveStartTime.Format(time.ANSIC))
+	builder.WriteString(fmt.Sprintf("%v", sbl.LiveStartTime))
 	builder.WriteString(", ")
 	builder.WriteString("live_end_time=")
-	builder.WriteString(sbl.LiveEndTime.Format(time.ANSIC))
+	builder.WriteString(fmt.Sprintf("%v", sbl.LiveEndTime))
 	builder.WriteString(", ")
 	builder.WriteString("create_time=")
 	builder.WriteString(sbl.CreateTime.Format(time.ANSIC))

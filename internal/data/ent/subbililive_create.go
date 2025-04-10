@@ -33,14 +33,14 @@ func (sblc *SubBiliLiveCreate) SetLiveState(i int64) *SubBiliLiveCreate {
 }
 
 // SetLiveStartTime sets the "live_start_time" field.
-func (sblc *SubBiliLiveCreate) SetLiveStartTime(t time.Time) *SubBiliLiveCreate {
-	sblc.mutation.SetLiveStartTime(t)
+func (sblc *SubBiliLiveCreate) SetLiveStartTime(i int64) *SubBiliLiveCreate {
+	sblc.mutation.SetLiveStartTime(i)
 	return sblc
 }
 
 // SetLiveEndTime sets the "live_end_time" field.
-func (sblc *SubBiliLiveCreate) SetLiveEndTime(t time.Time) *SubBiliLiveCreate {
-	sblc.mutation.SetLiveEndTime(t)
+func (sblc *SubBiliLiveCreate) SetLiveEndTime(i int64) *SubBiliLiveCreate {
+	sblc.mutation.SetLiveEndTime(i)
 	return sblc
 }
 
@@ -155,11 +155,11 @@ func (sblc *SubBiliLiveCreate) createSpec() (*SubBiliLive, *sqlgraph.CreateSpec)
 		_node.LiveState = value
 	}
 	if value, ok := sblc.mutation.LiveStartTime(); ok {
-		_spec.SetField(subbililive.FieldLiveStartTime, field.TypeTime, value)
+		_spec.SetField(subbililive.FieldLiveStartTime, field.TypeInt64, value)
 		_node.LiveStartTime = value
 	}
 	if value, ok := sblc.mutation.LiveEndTime(); ok {
-		_spec.SetField(subbililive.FieldLiveEndTime, field.TypeTime, value)
+		_spec.SetField(subbililive.FieldLiveEndTime, field.TypeInt64, value)
 		_node.LiveEndTime = value
 	}
 	if value, ok := sblc.mutation.CreateTime(); ok {

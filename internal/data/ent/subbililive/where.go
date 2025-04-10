@@ -65,12 +65,12 @@ func LiveState(v int64) predicate.SubBiliLive {
 }
 
 // LiveStartTime applies equality check predicate on the "live_start_time" field. It's identical to LiveStartTimeEQ.
-func LiveStartTime(v time.Time) predicate.SubBiliLive {
+func LiveStartTime(v int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldEQ(FieldLiveStartTime, v))
 }
 
 // LiveEndTime applies equality check predicate on the "live_end_time" field. It's identical to LiveEndTimeEQ.
-func LiveEndTime(v time.Time) predicate.SubBiliLive {
+func LiveEndTime(v int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldEQ(FieldLiveEndTime, v))
 }
 
@@ -165,82 +165,82 @@ func LiveStateLTE(v int64) predicate.SubBiliLive {
 }
 
 // LiveStartTimeEQ applies the EQ predicate on the "live_start_time" field.
-func LiveStartTimeEQ(v time.Time) predicate.SubBiliLive {
+func LiveStartTimeEQ(v int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldEQ(FieldLiveStartTime, v))
 }
 
 // LiveStartTimeNEQ applies the NEQ predicate on the "live_start_time" field.
-func LiveStartTimeNEQ(v time.Time) predicate.SubBiliLive {
+func LiveStartTimeNEQ(v int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldNEQ(FieldLiveStartTime, v))
 }
 
 // LiveStartTimeIn applies the In predicate on the "live_start_time" field.
-func LiveStartTimeIn(vs ...time.Time) predicate.SubBiliLive {
+func LiveStartTimeIn(vs ...int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldIn(FieldLiveStartTime, vs...))
 }
 
 // LiveStartTimeNotIn applies the NotIn predicate on the "live_start_time" field.
-func LiveStartTimeNotIn(vs ...time.Time) predicate.SubBiliLive {
+func LiveStartTimeNotIn(vs ...int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldNotIn(FieldLiveStartTime, vs...))
 }
 
 // LiveStartTimeGT applies the GT predicate on the "live_start_time" field.
-func LiveStartTimeGT(v time.Time) predicate.SubBiliLive {
+func LiveStartTimeGT(v int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldGT(FieldLiveStartTime, v))
 }
 
 // LiveStartTimeGTE applies the GTE predicate on the "live_start_time" field.
-func LiveStartTimeGTE(v time.Time) predicate.SubBiliLive {
+func LiveStartTimeGTE(v int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldGTE(FieldLiveStartTime, v))
 }
 
 // LiveStartTimeLT applies the LT predicate on the "live_start_time" field.
-func LiveStartTimeLT(v time.Time) predicate.SubBiliLive {
+func LiveStartTimeLT(v int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldLT(FieldLiveStartTime, v))
 }
 
 // LiveStartTimeLTE applies the LTE predicate on the "live_start_time" field.
-func LiveStartTimeLTE(v time.Time) predicate.SubBiliLive {
+func LiveStartTimeLTE(v int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldLTE(FieldLiveStartTime, v))
 }
 
 // LiveEndTimeEQ applies the EQ predicate on the "live_end_time" field.
-func LiveEndTimeEQ(v time.Time) predicate.SubBiliLive {
+func LiveEndTimeEQ(v int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldEQ(FieldLiveEndTime, v))
 }
 
 // LiveEndTimeNEQ applies the NEQ predicate on the "live_end_time" field.
-func LiveEndTimeNEQ(v time.Time) predicate.SubBiliLive {
+func LiveEndTimeNEQ(v int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldNEQ(FieldLiveEndTime, v))
 }
 
 // LiveEndTimeIn applies the In predicate on the "live_end_time" field.
-func LiveEndTimeIn(vs ...time.Time) predicate.SubBiliLive {
+func LiveEndTimeIn(vs ...int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldIn(FieldLiveEndTime, vs...))
 }
 
 // LiveEndTimeNotIn applies the NotIn predicate on the "live_end_time" field.
-func LiveEndTimeNotIn(vs ...time.Time) predicate.SubBiliLive {
+func LiveEndTimeNotIn(vs ...int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldNotIn(FieldLiveEndTime, vs...))
 }
 
 // LiveEndTimeGT applies the GT predicate on the "live_end_time" field.
-func LiveEndTimeGT(v time.Time) predicate.SubBiliLive {
+func LiveEndTimeGT(v int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldGT(FieldLiveEndTime, v))
 }
 
 // LiveEndTimeGTE applies the GTE predicate on the "live_end_time" field.
-func LiveEndTimeGTE(v time.Time) predicate.SubBiliLive {
+func LiveEndTimeGTE(v int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldGTE(FieldLiveEndTime, v))
 }
 
 // LiveEndTimeLT applies the LT predicate on the "live_end_time" field.
-func LiveEndTimeLT(v time.Time) predicate.SubBiliLive {
+func LiveEndTimeLT(v int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldLT(FieldLiveEndTime, v))
 }
 
 // LiveEndTimeLTE applies the LTE predicate on the "live_end_time" field.
-func LiveEndTimeLTE(v time.Time) predicate.SubBiliLive {
+func LiveEndTimeLTE(v int64) predicate.SubBiliLive {
 	return predicate.SubBiliLive(sql.FieldLTE(FieldLiveEndTime, v))
 }
 
