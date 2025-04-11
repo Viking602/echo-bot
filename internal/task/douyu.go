@@ -30,7 +30,7 @@ func NewDouyuTask(log *logger.Logger, bot *bot.Handler, sub *biz.SubUsecase, dou
 
 func (t *DouyuTask) Register(s *scheduler.Scheduler) []Info {
 	task := &scheduler.Task{
-		Interval: 60 * time.Second,
+		Interval: 30 * time.Second,
 		Name:     "checkDouyuLive",
 		Fn:       t.checkDouyuLive,
 	}

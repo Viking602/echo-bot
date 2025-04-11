@@ -25,6 +25,12 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server ./cmd
 # 第二阶段：运行阶段
 FROM alpine:latest
 
+RUN apk add --no-cache tzdata
+
+# 设置时区为 Asia/Shanghai (UTC+8)
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # 设置工作目录
 WORKDIR /root/
 
