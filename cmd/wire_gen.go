@@ -33,11 +33,16 @@ func wireApp(log *logger.Logger) (*app.App, error) {
 	subUsecase := biz.NewSubUsecase(subRepo)
 	biliLiveAddService := service.NewBiliLiveAddService(subBiliLiveUsecase, subUsecase, log)
 	biliLiveDelService := service.NewBiliLiveDelService(subBiliLiveUsecase, subUsecase, log)
-	commandRegistry := command.NewInitializedRegistry(setMasterService, biliLiveAddService, biliLiveDelService)
+	subDouyuLiveRepo := data.NewSubDouyuLiveRepo(dataData)
+	subDouyuLiveUsecase := biz.NewSubDouyuLiveUsecase(subDouyuLiveRepo)
+	douyuLiveAddService := service.NewDouyuLiveAddService(subDouyuLiveUsecase, subUsecase, log)
+	douyuLiveDelService := service.NewDouyuLiveDelService(subDouyuLiveUsecase, subUsecase, log)
+	commandRegistry := command.NewInitializedRegistry(setMasterService, biliLiveAddService, biliLiveDelService, douyuLiveAddService, douyuLiveDelService)
 	handler := bot.NewBotHandler(commandRegistry, log, botUsecase)
 	botBot := bot.NewBot(handler)
 	biliTask := task.NewBiliTask(log, handler, subUsecase, subBiliLiveUsecase)
-	taskTask := task.NewTask(log, biliTask)
+	douyuTask := task.NewDouyuTask(log, handler, subUsecase, subDouyuLiveUsecase)
+	taskTask := task.NewTask(log, biliTask, douyuTask)
 	appApp := app.NewApp(botBot, taskTask)
 	return appApp, nil
 }

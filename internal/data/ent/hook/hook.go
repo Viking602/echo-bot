@@ -44,6 +44,18 @@ func (f SubBiliLiveFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SubBiliLiveMutation", m)
 }
 
+// The SubDouyuLiveFunc type is an adapter to allow the use of ordinary
+// function as SubDouyuLive mutator.
+type SubDouyuLiveFunc func(context.Context, *ent.SubDouyuLiveMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SubDouyuLiveFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SubDouyuLiveMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SubDouyuLiveMutation", m)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

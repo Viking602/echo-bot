@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	ProviderSet = wire.NewSet(NewData, NewBotRepo, NewSubRepo, NewSubBiliLiveRepo)
+	ProviderSet = wire.NewSet(NewData, NewBotRepo, NewSubRepo, NewSubBiliLiveRepo, NewSubDouyuLiveRepo)
 )
 
 type Data struct {

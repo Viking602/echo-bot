@@ -7,6 +7,7 @@ import (
 	"echo/internal/data/ent/bot"
 	"echo/internal/data/ent/sub"
 	"echo/internal/data/ent/subbililive"
+	"echo/internal/data/ent/subdouyulive"
 	"errors"
 	"fmt"
 	"reflect"
@@ -75,9 +76,10 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			bot.Table:         bot.ValidColumn,
-			sub.Table:         sub.ValidColumn,
-			subbililive.Table: subbililive.ValidColumn,
+			bot.Table:          bot.ValidColumn,
+			sub.Table:          sub.ValidColumn,
+			subbililive.Table:  subbililive.ValidColumn,
+			subdouyulive.Table: subdouyulive.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

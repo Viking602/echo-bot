@@ -10,6 +10,7 @@ import (
 var ProviderSet = wire.NewSet(
 	NewTask,
 	NewBiliTask,
+	NewDouyuTask,
 )
 
 type RegistrarTask interface {
@@ -33,6 +34,7 @@ type Task struct {
 func NewTask(
 	log *logger.Logger,
 	biliTask *BiliTask,
+	douyuTask *DouyuTask,
 	// 其他依赖注入
 ) *Task {
 	sched := scheduler.NewScheduler(log)
@@ -40,7 +42,7 @@ func NewTask(
 	service := &Task{
 		scheduler: sched,
 		log:       log,
-		tasks:     []RegistrarTask{biliTask}, // 添加任务注册器
+		tasks:     []RegistrarTask{biliTask, douyuTask}, // 添加任务注册器
 	}
 
 	// 注册所有定时任务

@@ -17,11 +17,13 @@ func NewInitializedRegistry(
 	setService *service.SetMasterService,
 	biliLiveAddService *service.BiliLiveAddService,
 	biliLiveDelService *service.BiliLiveDelService,
+	douyuLiveAddService *service.DouyuLiveAddService,
+	douyuLiveDelService *service.DouyuLiveDelService,
 ) *registry.CommandRegistry {
 	reg := registry.NewCommandRegistry()
 	registrars := []model.CommandRegistrar{
 		NewSetCommand(setService),
-		NewLiveCommand(biliLiveAddService, biliLiveDelService),
+		NewLiveCommand(biliLiveAddService, biliLiveDelService, douyuLiveAddService, douyuLiveDelService),
 	}
 
 	for _, registrar := range registrars {

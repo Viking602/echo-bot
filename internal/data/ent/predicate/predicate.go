@@ -14,3 +14,6 @@ type Sub func(*sql.Selector)
 
 // SubBiliLive is the predicate function for subbililive builders.
 type SubBiliLive func(*sql.Selector)
+
+// SubDouyuLive is the predicate function for subdouyulive builders.
+type SubDouyuLive func(*sql.Selector)

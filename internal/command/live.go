@@ -7,14 +7,23 @@ import (
 )
 
 type LiveCommand struct {
-	biliAddLiveService *service.BiliLiveAddService
-	biliDelLiveService *service.BiliLiveDelService
+	biliAddLiveService  *service.BiliLiveAddService
+	biliDelLiveService  *service.BiliLiveDelService
+	douyuAddLiveService *service.DouyuLiveAddService
+	douyuLiveDelService *service.DouyuLiveDelService
 }
 
-func NewLiveCommand(biliAddLiveService *service.BiliLiveAddService, biliDelLiveService *service.BiliLiveDelService) *LiveCommand {
+func NewLiveCommand(
+	biliAddLiveService *service.BiliLiveAddService,
+	biliDelLiveService *service.BiliLiveDelService,
+	douyuAddLiveService *service.DouyuLiveAddService,
+	douyuLiveDelService *service.DouyuLiveDelService,
+) *LiveCommand {
 	return &LiveCommand{
-		biliAddLiveService: biliAddLiveService,
-		biliDelLiveService: biliDelLiveService,
+		biliAddLiveService:  biliAddLiveService,
+		biliDelLiveService:  biliDelLiveService,
+		douyuAddLiveService: douyuAddLiveService,
+		douyuLiveDelService: douyuLiveDelService,
 	}
 }
 
@@ -43,6 +52,14 @@ func (c *LiveCommand) Register(registry model.Registrar) {
 		return add
 	}, model.ScopeGroup)
 
+	douyuCmd := model.NewCommand("douyu", func(msg *model.OneBotMessage, args []string) string {
+		if len(args) == 0 {
+			return "请输入房间号 live add bilibili <房间号>"
+		}
+		add := c.douyuAddLiveService.AddLive(ctx, msg.SelfId, msg.GroupId, args[0])
+		return add
+	}, model.ScopeGroup)
+
 	// 删除逻辑
 	delCmd := model.NewCommand("del", func(msg *model.OneBotMessage, args []string) string {
 		if len(args) == 0 {
@@ -59,14 +76,24 @@ func (c *LiveCommand) Register(registry model.Registrar) {
 		return del
 	}, model.ScopeGroup)
 
+	douyuDelCmd := model.NewCommand("douyu", func(msg *model.OneBotMessage, args []string) string {
+		if len(args) == 0 {
+			return "请输入房间号 live del douyu <房间号>"
+		}
+		del := c.douyuLiveDelService.DelLive(ctx, msg.SelfId, msg.GroupId, args[0])
+		return del
+	}, model.ScopeGroup)
+
 	// 注册逻辑
 	// 子命令 添加逻辑
 	liveCmd.AddChild(addCmd)
 	addCmd.AddChild(biliCmd)
+	addCmd.AddChild(douyuCmd)
 
 	// 子命令 删除逻辑
 	liveCmd.AddChild(delCmd)
 	delCmd.AddChild(biliDelCmd)
+	delCmd.AddChild(douyuDelCmd)
 
 	// 注册根命令
 	registry.Register(liveCmd)

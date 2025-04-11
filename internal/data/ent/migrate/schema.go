@@ -61,16 +61,36 @@ var (
 		Columns:    SubBiliLiveColumns,
 		PrimaryKey: []*schema.Column{SubBiliLiveColumns[0]},
 	}
+	// SubDouyuLiveColumns holds the columns for the "sub_douyu_live" table.
+	SubDouyuLiveColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "room_id", Type: field.TypeInt64},
+		{Name: "live_state", Type: field.TypeInt64},
+		{Name: "live_start_time", Type: field.TypeInt64},
+		{Name: "live_end_time", Type: field.TypeInt64},
+		{Name: "create_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime, Nullable: true},
+	}
+	// SubDouyuLiveTable holds the schema information for the "sub_douyu_live" table.
+	SubDouyuLiveTable = &schema.Table{
+		Name:       "sub_douyu_live",
+		Columns:    SubDouyuLiveColumns,
+		PrimaryKey: []*schema.Column{SubDouyuLiveColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		BotsTable,
 		SubsTable,
 		SubBiliLiveTable,
+		SubDouyuLiveTable,
 	}
 )
 
 func init() {
 	SubBiliLiveTable.Annotation = &entsql.Annotation{
 		Table: "sub_bili_live",
+	}
+	SubDouyuLiveTable.Annotation = &entsql.Annotation{
+		Table: "sub_douyu_live",
 	}
 }

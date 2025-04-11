@@ -18,6 +18,8 @@ type Tx struct {
 	Sub *SubClient
 	// SubBiliLive is the client for interacting with the SubBiliLive builders.
 	SubBiliLive *SubBiliLiveClient
+	// SubDouyuLive is the client for interacting with the SubDouyuLive builders.
+	SubDouyuLive *SubDouyuLiveClient
 
 	// lazily loaded.
 	client     *Client
@@ -152,6 +154,7 @@ func (tx *Tx) init() {
 	tx.Bot = NewBotClient(tx.config)
 	tx.Sub = NewSubClient(tx.config)
 	tx.SubBiliLive = NewSubBiliLiveClient(tx.config)
+	tx.SubDouyuLive = NewSubDouyuLiveClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

@@ -83,7 +83,7 @@ func (t *BiliTask) checkBiliLive(ctx context.Context) error {
 					}
 					t.bot.SendGroupMessage(s.GroupId,
 						"直播通知小助手\n"+
-							"主播："+master.Data.Info.Uname+" 开始直播啦！\n"+
+							master.Data.Info.Uname+" 开播啦！\n"+
 							"标题："+state.Data.Title+"\n"+
 							"分区："+state.Data.AreaName+"\n"+
 							"时间："+state.Data.LiveTime+"\n"+
