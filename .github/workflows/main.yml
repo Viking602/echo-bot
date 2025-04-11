@@ -36,6 +36,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # 提取 Docker 元数据，仅使用 Git 标签
       - name: 提取 Docker 元数据
         id: meta
         uses: docker/metadata-action@v5
@@ -44,10 +45,7 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=pr
-            type=semver,pattern={{version}}
             type=raw,value={{raw}},enable=${{ startsWith(github.ref, 'refs/tags/') }}
-            type=raw,value=prerelease,enable=${{ startsWith(github.ref, 'refs/tags/alpha-') }}
-            type=sha
 
       - name: 构建并推送 Docker 镜像
         uses: docker/build-push-action@v6
