@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -18,4 +19,22 @@ func ParseTimeToTimestamp(timeStr string) int64 {
 
 	// 返回Unix时间戳（秒）
 	return t.Unix()
+}
+
+func FormatDuration(startTime, endTime int64) string {
+	// 计算时间差（秒数）
+	durationSeconds := endTime - startTime
+
+	// 确保时间差为正数
+	if durationSeconds < 0 {
+		durationSeconds = -durationSeconds
+	}
+
+	// 将时间差转换为小时、分钟、秒
+	hours := durationSeconds / 3600
+	minutes := (durationSeconds % 3600) / 60
+	seconds := durationSeconds % 60
+
+	// 格式化输出
+	return fmt.Sprintf("%d时%d分%d秒", hours, minutes, seconds)
 }

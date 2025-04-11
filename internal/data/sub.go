@@ -105,3 +105,54 @@ func (r *subRepo) GetSubBySubId(ctx context.Context, subId int64) ([]*biz.Sub, e
 	return result, nil
 
 }
+
+func (r *subRepo) GetSubBySubIdGroupIdSubTypeBotId(ctx context.Context, subId int64, groupId int64, subType int64, botId int64) (*biz.Sub, error) {
+	first, err := r.data.db.Sub.Query().Where(sub.SubID(subId), sub.GroupID(groupId), sub.SubType(subType), sub.BotID(botId)).First(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &biz.Sub{
+		Id:         first.ID,
+		SubId:      first.SubID,
+		SubType:    first.SubType,
+		GroupId:    first.GroupID,
+		Status:     first.Status,
+		BotId:      first.BotID,
+		CreateTime: first.CreateTime.Format("2006-01-02 15:04:05"),
+		UpdateTime: first.UpdateTime.Format("2006-01-02 15:04:05"),
+	}, nil
+}
+
+func (r *subRepo) DelBySubIdBotIdGroupId(ctx context.Context, bizSub *biz.Sub) error {
+	_, err := r.data.db.Sub.Delete().Where(sub.SubID(bizSub.SubId), sub.BotID(bizSub.BotId), sub.GroupID(bizSub.GroupId)).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func (r *subRepo) GetAllBySubIdSubType(ctx context.Context, subId int64, subType int64) ([]*biz.Sub, error) {
+	var result []*biz.Sub
+
+	subs, err := r.data.db.Sub.Query().Where(sub.SubID(subId), sub.SubType(subType)).All(ctx)
+	if err != nil {
+		if !ent.IsNotFound(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	for _, s := range subs {
+		result = append(result, &biz.Sub{
+			Id:         s.ID,
+			SubId:      s.SubID,
+			SubType:    s.SubType,
+			GroupId:    s.GroupID,
+			Status:     s.Status,
+			BotId:      s.BotID,
+			CreateTime: s.CreateTime.Format("2006-01-02 15:04:05"),
+			UpdateTime: s.UpdateTime.Format("2006-01-02 15:04:05"),
+		})
+	}
+	return result, nil
+}

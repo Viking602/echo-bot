@@ -1,6 +1,9 @@
 package biz
 
-import "context"
+import (
+	"context"
+	"echo/internal/data/ent"
+)
 
 type Sub struct {
 	Id         int64
@@ -18,6 +21,9 @@ type SubRepo interface {
 	GetSubByGroupIdSubType(ctx context.Context, groupId int64, subType int64) ([]*Sub, error)
 	GetSubBySubType(ctx context.Context, subType int64) ([]*Sub, error)
 	GetSubBySubId(ctx context.Context, subId int64) ([]*Sub, error)
+	GetSubBySubIdGroupIdSubTypeBotId(ctx context.Context, subId int64, groupId int64, subType int64, botId int64) (*Sub, error)
+	DelBySubIdBotIdGroupId(ctx context.Context, bizSub *Sub) error
+	GetAllBySubIdSubType(ctx context.Context, subId int64, subType int64) ([]*Sub, error)
 }
 
 type SubUsecase struct {
@@ -28,8 +34,16 @@ func NewSubUsecase(subRepo SubRepo) *SubUsecase {
 	return &SubUsecase{repo: subRepo}
 }
 
-func (u *SubUsecase) CreateSub(ctx context.Context, sub *Sub) error {
-	return u.repo.Create(ctx, sub)
+func (u *SubUsecase) CreateSub(ctx context.Context, sub *Sub) (error, bool) {
+	_, err := u.repo.GetSubBySubIdGroupIdSubTypeBotId(ctx, sub.SubId, sub.GroupId, sub.SubType, sub.BotId)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return u.repo.Create(ctx, sub), false
+		}
+		return err, false
+	}
+
+	return nil, true
 }
 
 func (u *SubUsecase) GetSubByGroupIdSubType(ctx context.Context, groupId int64, subType int64) ([]*Sub, error) {
@@ -42,4 +56,17 @@ func (u *SubUsecase) GetSubBySubType(ctx context.Context, subType int64) ([]*Sub
 
 func (u *SubUsecase) GetSubBySubId(ctx context.Context, subId int64) ([]*Sub, error) {
 	return u.repo.GetSubBySubId(ctx, subId)
+}
+
+func (u *SubUsecase) DelSub(ctx context.Context, sub *Sub) error {
+	get, err := u.repo.GetSubBySubIdGroupIdSubTypeBotId(ctx, sub.SubId, sub.GroupId, sub.SubType, sub.BotId)
+	if err != nil {
+		return err
+	}
+	return u.repo.DelBySubIdBotIdGroupId(ctx, get)
+
+}
+
+func (u *SubUsecase) GetAllBySubIdSubType(ctx context.Context, subId int64, subType int64) ([]*Sub, error) {
+	return u.repo.GetAllBySubIdSubType(ctx, subId, subType)
 }

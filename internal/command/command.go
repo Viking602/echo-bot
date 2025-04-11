@@ -13,11 +13,15 @@ var ProviderSet = wire.NewSet(
 	NewInitializedRegistry,
 )
 
-func NewInitializedRegistry(setService *service.SetMasterService, liveService *service.LiveAddService) *registry.CommandRegistry {
+func NewInitializedRegistry(
+	setService *service.SetMasterService,
+	biliLiveAddService *service.BiliLiveAddService,
+	biliLiveDelService *service.BiliLiveDelService,
+) *registry.CommandRegistry {
 	reg := registry.NewCommandRegistry()
 	registrars := []model.CommandRegistrar{
 		NewSetCommand(setService),
-		NewLiveCommand(liveService),
+		NewLiveCommand(biliLiveAddService, biliLiveDelService),
 	}
 
 	for _, registrar := range registrars {

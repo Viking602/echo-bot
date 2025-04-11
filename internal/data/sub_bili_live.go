@@ -78,3 +78,12 @@ func (r *subBiliLiveRepo) UpdateByRoomId(ctx context.Context, live *biz.SubBiliL
 	}
 	return nil
 }
+
+func (r *subBiliLiveRepo) Del(ctx context.Context, id int64) error {
+	_, err := r.data.db.SubBiliLive.Delete().Where(subbililive.ID(id)).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}

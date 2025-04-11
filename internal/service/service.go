@@ -4,5 +4,6 @@ import "github.com/google/wire"
 
 var ProviderSet = wire.NewSet(
 	NewSetMasterService,
-	NewLiveAddService,
+	NewBiliLiveAddService,
+	NewBiliLiveDelService,
 )

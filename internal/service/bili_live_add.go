@@ -9,21 +9,21 @@ import (
 	"strconv"
 )
 
-type LiveAddService struct {
+type BiliLiveAddService struct {
 	bili *biz.SubBiliLiveUsecase
 	sub  *biz.SubUsecase
 	log  *logger.Logger
 }
 
-func NewLiveAddService(bili *biz.SubBiliLiveUsecase, sub *biz.SubUsecase, log *logger.Logger) *LiveAddService {
-	return &LiveAddService{
+func NewBiliLiveAddService(bili *biz.SubBiliLiveUsecase, sub *biz.SubUsecase, log *logger.Logger) *BiliLiveAddService {
+	return &BiliLiveAddService{
 		bili: bili,
 		sub:  sub,
 		log:  log,
 	}
 }
 
-func (s *LiveAddService) AddLive(ctx context.Context, selfId int64, groupId int64, roomId string) string {
+func (s *BiliLiveAddService) AddLive(ctx context.Context, selfId int64, groupId int64, roomId string) string {
 	bili := bilibili.NewClient()
 
 	live, err := bili.GetLiveState(roomId)
@@ -53,15 +53,20 @@ func (s *LiveAddService) AddLive(ctx context.Context, selfId int64, groupId int6
 		return "订阅失败"
 	}
 
-	if err := s.sub.CreateSub(ctx, &biz.Sub{
+	err, exits := s.sub.CreateSub(ctx, &biz.Sub{
 		GroupId: groupId,
 		SubId:   createId,
 		BotId:   selfId,
 		SubType: 1,
 		Status:  1,
-	}); err != nil {
+	})
+	if err != nil {
 		s.log.Error().Err(err).Int64("selfId", selfId).Int64("groupId", groupId).Msg("创建订阅失败")
 		return "订阅失败"
+	}
+
+	if exits {
+		return fmt.Sprintf("%s 当前订阅记录已存在", roomId)
 	}
 
 	return fmt.Sprintf("%s 直播间订阅成功", info.Data.Info.Uname)
