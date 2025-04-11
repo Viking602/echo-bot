@@ -83,6 +83,7 @@ func (t *BiliTask) checkBiliLive(ctx context.Context) error {
 							"主播："+master.Data.Info.Uname+" 开始直播啦！\n"+
 							"标题："+state.Data.Title+"\n"+
 							"分区："+state.Data.AreaName+"\n"+
+							"时间："+state.Data.LiveTime+"\n"+
 							"链接：https://live.bilibili.com/"+strconv.FormatInt(int64(master.Data.RoomId), 10)+"\n"+
 							"[CQ:image,file="+state.Data.UserCover+",type=show,id=40000]", socket,
 					)
