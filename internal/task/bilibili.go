@@ -30,7 +30,7 @@ func NewBiliTask(log *logger.Logger, bot *bot.Handler, sub *biz.SubUsecase, bili
 
 func (t *BiliTask) Register(s *scheduler.Scheduler) []Info {
 	task := &scheduler.Task{
-		Name:     "check-bilibili-live",
+		Name:     "bilibili直播任务",
 		Interval: time.Second * 60,
 		Fn:       t.checkBiliLive,
 	}
@@ -63,11 +63,12 @@ func (t *BiliTask) checkBiliLive(ctx context.Context) error {
 			t.log.Warn().Err(err).Msg("获取数据失败")
 		}
 
+		state, err := bili.GetLiveState(strconv.FormatInt(v.RoomId, 10))
+		if err != nil {
+			t.log.Warn().Err(err).Msg("获取直播间状态失败")
+		}
+
 		if v.LiveState == 0 {
-			state, err := bili.GetLiveState(strconv.FormatInt(v.RoomId, 10))
-			if err != nil {
-				t.log.Warn().Err(err).Msg("获取直播间状态失败")
-			}
 
 			if state.Code == 0 && state.Data.LiveStatus == 1 {
 
@@ -103,10 +104,6 @@ func (t *BiliTask) checkBiliLive(ctx context.Context) error {
 
 			}
 		} else if v.LiveState == 1 {
-			state, err := bili.GetLiveState(strconv.FormatInt(v.RoomId, 10))
-			if err != nil {
-				t.log.Warn().Err(err).Msg("获取直播间状态失败")
-			}
 
 			if state.Code == 0 && state.Data.LiveStatus == 0 {
 

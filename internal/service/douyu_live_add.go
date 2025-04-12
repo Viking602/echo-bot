@@ -36,6 +36,10 @@ func (s *DouyuLiveAddService) AddLive(ctx context.Context, selfId int64, groupId
 		return "订阅失败"
 	}
 
+	if len(search.Data.RecList) == 0 {
+		return "订阅失败，请检查直播间是否存在"
+	}
+
 	if search.Data.RecList[0].RoomInfo.Rid != room {
 		return "订阅失败，请检查直播间是否存在"
 	}

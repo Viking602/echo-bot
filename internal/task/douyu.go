@@ -31,7 +31,7 @@ func NewDouyuTask(log *logger.Logger, bot *bot.Handler, sub *biz.SubUsecase, dou
 func (t *DouyuTask) Register(s *scheduler.Scheduler) []Info {
 	task := &scheduler.Task{
 		Interval: 30 * time.Second,
-		Name:     "checkDouyuLive",
+		Name:     "斗鱼直播任务",
 		Fn:       t.checkDouyuLive,
 	}
 
@@ -62,6 +62,10 @@ func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 		}
 
 		sub, err := t.sub.GetSubBySubType(ctx, 2)
+		if err != nil {
+			t.log.Errorf("获取订阅失败: %v", err)
+		}
+
 		if v.LiveState == 0 {
 
 			if search.Data.RecList[0].RoomInfo.IsLive == 1 {
@@ -96,7 +100,7 @@ func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 
 			endTime := time.Now().Unix()
 
-			if search.Data.RecList[0].RoomInfo.IsLive == 0 {
+			if search.Data.RecList[0].RoomInfo.IsLive == 2 {
 				for _, s := range sub {
 					socket, exits := t.bot.GetConnByBotId(s.BotId)
 					if !exits {
