@@ -47,7 +47,7 @@ func (t *DouyuTask) Register(s *scheduler.Scheduler) []Info {
 
 func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 
-	dy := douyu.NewClient()
+	dy := douyu.NewClient(t.log)
 
 	all, err := t.douyuSub.GetAll(ctx)
 	if err != nil {
@@ -56,19 +56,26 @@ func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 	}
 
 	for _, v := range all {
-		search, err := dy.Search(strconv.FormatInt(v.RoomId, 10))
+		search, err := dy.GetRoomInfo(strconv.FormatInt(v.RoomId, 10))
 		if err != nil {
 			t.log.Errorf("获取斗鱼直播间失败: %v", err)
 		}
+
+		t.log.Info().Int64("error_code", search.Error).Int64("roomId", v.RoomId).Msg("任务检查")
 
 		sub, err := t.sub.GetSubBySubType(ctx, 2)
 		if err != nil {
 			t.log.Errorf("获取订阅失败: %v", err)
 		}
 
+		if search.Error != 0 {
+			t.log.Error().Err(err).Msg("斗鱼搜索失败")
+			continue
+		}
+
 		if v.LiveState == 0 {
 
-			if search.Data.RecList[0].RoomInfo.IsLive == 1 {
+			if search.Data.RoomStatus == "1" {
 
 				for _, s := range sub {
 					socket, exits := t.bot.GetConnByBotId(s.BotId)
@@ -78,19 +85,19 @@ func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 
 					t.bot.SendGroupMessage(s.GroupId,
 						"直播通知小助手\n"+
-							search.Data.RecList[0].RoomInfo.NickName+" 开播啦！\n"+
-							"标题："+search.Data.RecList[0].RoomInfo.Description+"\n"+
-							"分区："+search.Data.RecList[0].RoomInfo.CateName+"\n"+
-							"时间："+time.Unix(search.Data.RecList[0].RoomInfo.LastShowTime, 10).Format("2006-01-02 15:04:05")+"\n"+
-							"链接："+search.Data.RecList[0].RoomInfo.BkUrl+"\n"+
-							"[CQ:image,file="+search.Data.RecList[0].RoomInfo.RoomSrc+",type=show,id=40000]", socket,
+							search.Data.OwnerName+" 开播啦！\n"+
+							"标题："+search.Data.RoomName+"\n"+
+							"分区："+search.Data.CateName+"\n"+
+							"时间："+search.Data.StartTime+"\n"+
+							"链接："+"https://www.douyu.com/"+search.Data.RoomId+"\n"+
+							"[CQ:image,file="+search.Data.RoomThumb+",type=show,id=40000]", socket,
 					)
 				}
 
 				if err := t.douyuSub.UpdateLive(ctx, &biz.SubDouyuLive{
 					RoomId:        v.RoomId,
 					LiveState:     1,
-					LiveStartTime: search.Data.RecList[0].RoomInfo.LastShowTime,
+					LiveStartTime: utils.ParseTimeToTimestamp(search.Data.StartTime),
 					LiveEndTime:   0,
 				}); err != nil {
 					t.log.Error().Err(err).Msg("更新直播间状态失败")
@@ -100,7 +107,7 @@ func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 
 			endTime := time.Now().Unix()
 
-			if search.Data.RecList[0].RoomInfo.IsLive == 2 {
+			if search.Data.RoomStatus == "2" {
 				for _, s := range sub {
 					socket, exits := t.bot.GetConnByBotId(s.BotId)
 					if !exits {
@@ -108,7 +115,7 @@ func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 					}
 
 					t.bot.SendGroupMessage(s.GroupId,
-						"主播："+search.Data.RecList[0].RoomInfo.NickName+" 已下播\n"+
+						"主播："+search.Data.OwnerName+" 已下播\n"+
 							"直播时长："+utils.FormatDuration(v.LiveStartTime, endTime)+"", socket)
 				}
 

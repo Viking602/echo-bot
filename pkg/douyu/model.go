@@ -44,3 +44,33 @@ type SearchAPI struct {
 	Error int    `json:"error"`
 	Msg   string `json:"msg"`
 }
+
+type RoomAPI struct {
+	Error int64 `json:"error"`
+	Data  struct {
+		RoomId      string `json:"room_id"`
+		RoomThumb   string `json:"room_thumb"`
+		CateId      string `json:"cate_id"`
+		CateName    string `json:"cate_name"`
+		RoomName    string `json:"room_name"`
+		RoomStatus  string `json:"room_status"`
+		StartTime   string `json:"start_time"`
+		OwnerName   string `json:"owner_name"`
+		Avatar      string `json:"avatar"`
+		Online      int64  `json:"online"`
+		Hn          int64  `json:"hn"`
+		OwnerWeight string `json:"owner_weight"`
+		FansNum     string `json:"fans_num"`
+		Gift        []struct {
+			Id    string  `json:"id"`
+			Name  string  `json:"name"`
+			Type  string  `json:"type"`
+			Pc    float64 `json:"pc"`
+			Gx    int64   `json:"gx"`
+			Desc  string  `json:"desc"`
+			Intro string  `json:"intro"`
+			Mimg  string  `json:"mimg"`
+			Himg  string  `json:"himg"`
+		} `json:"gift"`
+	} `json:"data"`
+}

@@ -24,8 +24,8 @@ func NewDouyuLiveAddService(douyu *biz.SubDouyuLiveUsecase, sub *biz.SubUsecase,
 }
 
 func (s *DouyuLiveAddService) AddLive(ctx context.Context, selfId int64, groupId int64, roomId string) string {
-	dy := douyu.NewClient()
-	search, err := dy.Search(roomId)
+	dy := douyu.NewClient(s.log)
+	search, err := dy.GetRoomInfo(roomId)
 	if err != nil {
 		return "订阅失败"
 	}
@@ -36,13 +36,10 @@ func (s *DouyuLiveAddService) AddLive(ctx context.Context, selfId int64, groupId
 		return "订阅失败"
 	}
 
-	if len(search.Data.RecList) == 0 {
+	if search.Error != 0 {
 		return "订阅失败，请检查直播间是否存在"
 	}
 
-	if search.Data.RecList[0].RoomInfo.Rid != room {
-		return "订阅失败，请检查直播间是否存在"
-	}
 	subId, err := s.douyu.CreateNewLive(ctx, &biz.SubDouyuLive{
 		RoomId: room,
 	})
@@ -67,6 +64,6 @@ func (s *DouyuLiveAddService) AddLive(ctx context.Context, selfId int64, groupId
 		return fmt.Sprintf("%s 当前订阅记录已存在", roomId)
 	}
 
-	return fmt.Sprintf("%s 直播间订阅成功", search.Data.RecList[0].RoomInfo.NickName)
+	return fmt.Sprintf("%s 直播间订阅成功", search.Data.OwnerName)
 
 }

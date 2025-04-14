@@ -1,15 +1,17 @@
 package douyu
 
 import (
+	"echo/pkg/logger"
 	"github.com/imroc/req/v3"
 	"time"
 )
 
 type Client struct {
 	client *req.Client
+	log    *logger.Logger
 }
 
-func NewClient() *Client {
+func NewClient(log *logger.Logger) *Client {
 	client := req.C().
 		SetTLSFingerprintChrome().
 		ImpersonateChrome().
@@ -18,5 +20,6 @@ func NewClient() *Client {
 
 	return &Client{
 		client: client,
+		log:    log,
 	}
 }
