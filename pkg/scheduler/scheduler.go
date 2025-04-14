@@ -96,7 +96,7 @@ func (s *Scheduler) runTask(name string, task *Task) {
 		}
 	}()
 
-	s.log.Info().Str("task", name).Msg("定时任务开始运行")
+	s.log.Info().Msgf("定时任务启动: %s, 间隔: %s", name, task.Interval.String())
 
 	for {
 		// 检查上下文是否取消

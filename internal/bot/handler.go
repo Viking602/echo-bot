@@ -113,8 +113,9 @@ func (h *Handler) OnMessage(socket *gws.Conn, message *gws.Message) {
 		if msg.PostType == "message" {
 			if msg.MessageType == "private" {
 				h.logger.Info().Str("原文", msg.RawMessage).Int64("接收者", msg.SelfId).Int64("发送者", msg.UserId).Msg("[私信]")
+				h.logger.Info().Msgf("[私信](%d => %d):%s", msg.UserId, msg.SelfId, msg.RawMessage)
 			} else if msg.MessageType == "group" {
-				h.logger.Info().Int64("发送者", msg.UserId).Int64("接收者", msg.SelfId).Int64("群号", msg.GroupId).Str("原文", msg.RawMessage).Msg("[群消息]")
+				h.logger.Info().Msgf("[群消息](%d => %d => %d):%s", msg.UserId, msg.GroupId, msg.SelfId, msg.RawMessage)
 			}
 			reply, ok := h.registry.Execute(&msg)
 			if ok {

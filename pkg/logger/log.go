@@ -6,7 +6,6 @@ import (
 	"github.com/rs/zerolog"
 	"os"
 	"strings"
-	"time"
 )
 
 // Logger 是一个封装了 zerolog 的日志记录器
@@ -43,7 +42,7 @@ func NewLogger() *Logger {
 	}
 
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnixMs
-	output.TimeFormat = time.RFC3339Nano
+	output.TimeFormat = "2006-01-02T15:04:05.000"
 
 	// 通过自定义 FormatLevel 设置日志级别颜色
 	output.FormatLevel = func(i interface{}) string {
@@ -51,21 +50,21 @@ func NewLogger() *Logger {
 			// 根据日志级别自定义颜色
 			switch strings.ToUpper(level) {
 			case "DEBUG":
-				return fmt.Sprintf("\033[36m| %-5s|\033[0m", strings.ToUpper(level)) // 青色
+				return fmt.Sprintf("\033[36m[%s]\033[0m", strings.ToUpper(level)) // 青色
 			case "INFO":
-				return fmt.Sprintf("\033[32m| %-5s|\033[0m", strings.ToUpper(level)) // 绿色
+				return fmt.Sprintf("\033[32m[%s]\033[0m", strings.ToUpper(level)) // 绿色
 			case "WARN":
-				return fmt.Sprintf("\033[33m| %-5s|\033[0m", strings.ToUpper(level)) // 黄色
+				return fmt.Sprintf("\033[33m[%s]\033[0m", strings.ToUpper(level)) // 黄色
 			case "ERROR":
-				return fmt.Sprintf("\033[31m| %-5s|\033[0m", strings.ToUpper(level)) // 红色
+				return fmt.Sprintf("\033[31m[%s]\033[0m", strings.ToUpper(level)) // 红色
 			default:
-				return fmt.Sprintf("| %-5s |", strings.ToUpper(level)) // 默认无颜色
+				return fmt.Sprintf("[%-5s]", strings.ToUpper(level)) // 默认无颜色
 			}
 		}
-		return "| UNKNOWN |"
+		return "[UNKNOWN]"
 	}
-	output.FormatMessage = func(i interface{}) string { return fmt.Sprintf("msg=%s", i) }
-	output.FormatFieldName = func(i interface{}) string { return fmt.Sprintf("%s=", i) }
+	output.FormatMessage = func(i interface{}) string { return fmt.Sprintf("%s", i) }
+	output.FormatFieldName = func(i interface{}) string { return fmt.Sprintf("%s: ", i) }
 	output.FormatFieldValue = func(i interface{}) string { return fmt.Sprintf("%v", i) }
 
 	// 创建一个新的 zerolog 实例，并设置日志级别为全局日志级别
@@ -103,16 +102,16 @@ func (l *Logger) Warn() *zerolog.Event {
 
 // Infof 格式化记录 Info 级别日志
 func (l *Logger) Infof(format string, args ...interface{}) {
-	l.log.Info().Msg(fmt.Sprintf(format, args...))
+	l.log.Info().Msgf(format, args)
 }
 
 // Errorf 格式化记录 Error 级别日志
 func (l *Logger) Errorf(format string, args ...interface{}) {
-	l.log.Error().Msg(fmt.Sprintf(format, args...))
+	l.log.Error().Msgf(format, args)
 }
 
 func (l *Logger) Warnf(format string, args ...interface{}) {
-	l.log.Warn().Msg(fmt.Sprintf(format, args...))
+	l.log.Warn().Msgf(format, args)
 }
 
 func (l *Logger) Debugf(format string, args ...interface{}) {

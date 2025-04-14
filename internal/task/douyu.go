@@ -61,8 +61,6 @@ func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 			t.log.Errorf("获取斗鱼直播间失败: %v", err)
 		}
 
-		t.log.Info().Int64("error_code", search.Error).Int64("roomId", v.RoomId).Msg("任务检查")
-
 		sub, err := t.sub.GetSubBySubType(ctx, 2)
 		if err != nil {
 			t.log.Errorf("获取订阅失败: %v", err)
