@@ -58,7 +58,7 @@ func (t *BiliTask) checkBiliLive(ctx context.Context) error {
 
 	for _, v := range all {
 
-		sub, err := t.sub.GetSubBySubId(ctx, v.Id)
+		sub, err := t.sub.GetSubBySubIdSubType(ctx, v.Id, 1)
 		if err != nil {
 			t.log.Warn().Err(err).Msg("获取数据失败")
 		}

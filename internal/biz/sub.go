@@ -46,6 +46,10 @@ func (u *SubUsecase) CreateSub(ctx context.Context, sub *Sub) (error, bool) {
 	return nil, true
 }
 
+func (u *SubUsecase) GetSubBySubIdSubType(ctx context.Context, subId int64, subType int64) ([]*Sub, error) {
+	return u.repo.GetAllBySubIdSubType(ctx, subId, subType)
+}
+
 func (u *SubUsecase) GetSubByGroupIdSubType(ctx context.Context, groupId int64, subType int64) ([]*Sub, error) {
 	return u.repo.GetSubByGroupIdSubType(ctx, groupId, subType)
 }

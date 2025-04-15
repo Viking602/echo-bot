@@ -61,7 +61,7 @@ func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 			t.log.Errorf("获取斗鱼直播间失败: %v", err)
 		}
 
-		sub, err := t.sub.GetSubBySubType(ctx, 2)
+		sub, err := t.sub.GetSubBySubIdSubType(ctx, v.Id, 2)
 		if err != nil {
 			t.log.Errorf("获取订阅失败: %v", err)
 		}
@@ -88,7 +88,7 @@ func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 							"分区："+search.Data.CateName+"\n"+
 							"时间："+search.Data.StartTime+"\n"+
 							"链接："+"https://www.douyu.com/"+search.Data.RoomId+"\n"+
-							"[CQ:image,file="+search.Data.RoomThumb+",type=show,id=40000]", socket,
+							"[CQ:image,file="+search.Data.RoomThumb+",sub_type=0]", socket,
 					)
 				}
 

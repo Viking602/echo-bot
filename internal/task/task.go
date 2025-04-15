@@ -1,6 +1,7 @@
 package task
 
 import (
+	"context"
 	"echo/pkg/logger"
 	"echo/pkg/scheduler"
 	"github.com/google/wire"
@@ -11,6 +12,7 @@ var ProviderSet = wire.NewSet(
 	NewTask,
 	NewBiliTask,
 	NewDouyuTask,
+	NewMoyuTask,
 )
 
 type RegistrarTask interface {
@@ -20,6 +22,7 @@ type RegistrarTask interface {
 type Info struct {
 	Name     string
 	Interval time.Duration
+	Cron     string
 }
 
 // Task 定时任务服务
@@ -27,7 +30,7 @@ type Task struct {
 	scheduler *scheduler.Scheduler
 	log       *logger.Logger
 	tasks     []RegistrarTask // 所有任务注册器
-	// 可能需要的其他依赖，比如数据库、API 客户端等
+	Fn        func(ctx context.Context) error
 }
 
 // NewTask 创建定时任务服务
@@ -35,14 +38,14 @@ func NewTask(
 	log *logger.Logger,
 	biliTask *BiliTask,
 	douyuTask *DouyuTask,
-	// 其他依赖注入
+	moyuTask *MoyuTask,
 ) *Task {
 	sched := scheduler.NewScheduler(log)
 
 	service := &Task{
 		scheduler: sched,
 		log:       log,
-		tasks:     []RegistrarTask{biliTask, douyuTask}, // 添加任务注册器
+		tasks:     []RegistrarTask{biliTask, douyuTask, moyuTask}, // 添加任务注册器
 	}
 
 	// 注册所有定时任务

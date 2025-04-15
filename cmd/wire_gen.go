@@ -37,12 +37,14 @@ func wireApp(log *logger.Logger) (*app.App, error) {
 	subDouyuLiveUsecase := biz.NewSubDouyuLiveUsecase(subDouyuLiveRepo)
 	douyuLiveAddService := service.NewDouyuLiveAddService(subDouyuLiveUsecase, subUsecase, log)
 	douyuLiveDelService := service.NewDouyuLiveDelService(subDouyuLiveUsecase, subUsecase, log)
-	commandRegistry := command.NewInitializedRegistry(setMasterService, biliLiveAddService, biliLiveDelService, douyuLiveAddService, douyuLiveDelService)
+	groupMoyuService := service.NewGroupMoyuService(subUsecase, log)
+	commandRegistry := command.NewInitializedRegistry(setMasterService, biliLiveAddService, biliLiveDelService, douyuLiveAddService, douyuLiveDelService, groupMoyuService)
 	handler := bot.NewBotHandler(commandRegistry, log, botUsecase)
 	botBot := bot.NewBot(handler)
 	biliTask := task.NewBiliTask(log, handler, subUsecase, subBiliLiveUsecase)
 	douyuTask := task.NewDouyuTask(log, handler, subUsecase, subDouyuLiveUsecase)
-	taskTask := task.NewTask(log, biliTask, douyuTask)
+	moyuTask := task.NewMoyuTask(log, handler, subUsecase)
+	taskTask := task.NewTask(log, biliTask, douyuTask, moyuTask)
 	appApp := app.NewApp(botBot, taskTask)
 	return appApp, nil
 }
