@@ -42,11 +42,6 @@ func NewScheduler(log *logger.Logger) *Scheduler {
 // runTask 运行一个定时任务
 func (s *Scheduler) runTask(name string, task *Task) {
 	defer s.wg.Done()
-	defer func() {
-		if r := recover(); r != nil {
-			s.log.Error().Interface("panic", r).Str("task", name).Msg("定时任务发生异常")
-		}
-	}()
 
 	s.log.Info().Msgf("定时任务启动: %s, 间隔: %s", name, task.Interval.String())
 
@@ -66,11 +61,19 @@ func (s *Scheduler) runTask(name string, task *Task) {
 			// 继续执行
 		}
 
-		// 执行任务
+		// 执行任务并捕获异常
 		s.log.Debug().Str("task", name).Str("time", time.Now().Format("15:04:05")).Msg("执行定时任务")
-		if err := task.Fn(s.ctx); err != nil {
-			s.log.Error().Err(err).Str("task", name).Msg("执行定时任务出错")
-		}
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					s.log.Error().Interface("panic", r).Str("task", name).Msg("定时任务发生异常，将继续重试")
+				}
+			}()
+
+			if err := task.Fn(s.ctx); err != nil {
+				s.log.Error().Err(err).Str("task", name).Msg("执行定时任务出错，将继续重试")
+			}
+		}()
 	}
 }
 
@@ -95,14 +98,19 @@ func (s *Scheduler) Start() {
 	s.log.Info().Msg("定时任务调度器启动")
 
 	for name, task := range s.tasks {
-
 		// 使用 crontab 表达式
 		if task.Cron != "" {
-			// 包装任务函数，使其能接收上下文
+			// 包装任务函数，使其能接收上下文并捕获异常
 			taskFn := func() {
+				defer func() {
+					if r := recover(); r != nil {
+						s.log.Error().Interface("panic", r).Str("task", name).Msg("定时任务发生异常，将继续重试")
+					}
+				}()
+
 				s.log.Debug().Str("task", name).Str("time", time.Now().Format("15:04:05")).Msg("执行定时任务")
 				if err := task.Fn(s.ctx); err != nil {
-					s.log.Error().Err(err).Str("task", name).Msg("执行定时任务出错")
+					s.log.Error().Err(err).Str("task", name).Msg("执行定时任务出错，将继续重试")
 				}
 			}
 
