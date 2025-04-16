@@ -2,14 +2,9 @@ name: Build and Push
 
 on:
   push:
-    branches:
-      - master
     tags:
-      - 'v*'
-      - 'alpha-*'
-  pull_request:
-    branches:
-      - master
+      - 'v*'          # 匹配 v1.0.0 等版本标签
+      - 'alpha-*'     # 匹配 alpha-1 等测试标签
 
 env:
   REGISTRY: ghcr.io
@@ -36,24 +31,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 提取 Docker 元数据，仅使用 Git 标签
       - name: 提取 Docker 元数据
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=raw,value={{raw}},enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=semver,pattern={{version}}
+            type=raw,value={{raw}}
 
       - name: 构建并推送 Docker 镜像
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64  # 支持 amd64 和 arm64
-          push: ${{ github.event_name != 'pull_request' }}  # 仅在非拉取请求时推送
+          platforms: linux/amd64,linux/arm64
+          push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
