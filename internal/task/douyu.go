@@ -64,6 +64,7 @@ func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 		sub, err := t.sub.GetSubBySubIdSubType(ctx, v.Id, 2)
 		if err != nil {
 			t.log.Errorf("获取订阅失败: %v", err)
+			continue
 		}
 
 		if search.Error != 0 {
@@ -79,6 +80,7 @@ func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 					socket, exits := t.bot.GetConnByBotId(s.BotId)
 					if !exits {
 						t.log.Warn().Err(err).Int64("BotId", s.BotId).Msg("获取 socket 失败")
+						continue
 					}
 
 					t.bot.SendGroupMessage(s.GroupId,
@@ -99,6 +101,7 @@ func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 					LiveEndTime:   0,
 				}); err != nil {
 					t.log.Error().Err(err).Msg("更新直播间状态失败")
+					continue
 				}
 			}
 		} else if v.LiveState == 1 {
@@ -110,6 +113,7 @@ func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 					socket, exits := t.bot.GetConnByBotId(s.BotId)
 					if !exits {
 						t.log.Warn().Err(err).Int64("BotId", s.BotId).Msg("获取 socket 失败")
+						continue
 					}
 
 					t.bot.SendGroupMessage(s.GroupId,
@@ -124,6 +128,7 @@ func (t *DouyuTask) checkDouyuLive(ctx context.Context) error {
 					LiveEndTime:   endTime,
 				}); err != nil {
 					t.log.Error().Err(err).Msg("更新直播间状态失败")
+					continue
 				}
 
 			}

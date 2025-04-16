@@ -61,11 +61,13 @@ func (t *BiliTask) checkBiliLive(ctx context.Context) error {
 		sub, err := t.sub.GetSubBySubIdSubType(ctx, v.Id, 1)
 		if err != nil {
 			t.log.Warn().Err(err).Msg("获取数据失败")
+			continue
 		}
 
 		state, err := bili.GetLiveState(strconv.FormatInt(v.RoomId, 10))
 		if err != nil {
 			t.log.Warn().Err(err).Msg("获取直播间状态失败")
+			continue
 		}
 
 		if v.LiveState == 0 {
@@ -81,6 +83,7 @@ func (t *BiliTask) checkBiliLive(ctx context.Context) error {
 					master, err := bili.GetMasterInfo(strconv.FormatInt(state.Data.Uid, 10))
 					if err != nil {
 						t.log.Warn().Err(err).Msg("获取主播信息失败")
+						continue
 					}
 					t.bot.SendGroupMessage(s.GroupId,
 						"直播通知小助手\n"+
@@ -98,6 +101,7 @@ func (t *BiliTask) checkBiliLive(ctx context.Context) error {
 						LiveStartTime: utils.ParseTimeToTimestamp(state.Data.LiveTime),
 					}); err != nil {
 						t.log.Error().Err(err).Msg("更新直播间状态失败")
+						continue
 					}
 
 				}
@@ -111,11 +115,13 @@ func (t *BiliTask) checkBiliLive(ctx context.Context) error {
 					socket, exits := t.bot.GetConnByBotId(s.BotId)
 					if !exits {
 						t.log.Warn().Err(err).Int64("BotId", s.BotId).Msg("获取 socket 失败")
+						continue
 					}
 
 					master, err := bili.GetMasterInfo(strconv.FormatInt(state.Data.Uid, 10))
 					if err != nil {
 						t.log.Warn().Err(err).Msg("获取主播信息失败")
+						continue
 					}
 
 					endTime := time.Now().Unix()
@@ -131,6 +137,7 @@ func (t *BiliTask) checkBiliLive(ctx context.Context) error {
 					LiveEndTime: time.Now().Unix(),
 				}); err != nil {
 					t.log.Error().Err(err).Msg("更新直播间状态失败")
+					continue
 				}
 			}
 		}
